@@ -3,8 +3,14 @@ import AuthLayout from '../../Components/AuthLayout'
 import { motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import Input from '../../Components/Input'
-// import { useAuthStore } from '../../store/authStore'
+import { useAuthStore } from '../../store/authStore'
 import PasswordStrengthMeter from '../../Components/PasswordStrengthMeter'
+import { Loader } from 'lucide-react'
+
+
+
+
+
 const Signup = () => {
 
   const [fullName, setFullName] = useState("")
@@ -14,7 +20,7 @@ const Signup = () => {
 
   const navigate = useNavigate()
 
-  // const { signup, isLoading } = useAuthStore()
+  const { signup, isLoading } = useAuthStore()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -109,8 +115,9 @@ const Signup = () => {
             custom={3}
             type="submit"
             className="w-full py-2.5 cursor-pointer rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold tracking-wide shadow-md transition-all"
+            disabled={isLoading}
           >
-            SIGN UP
+            {isLoading ? <Loader className='animate-spin mx-auto' size={24} /> : "SIGN UP"}
           </motion.button>
 
           <motion.p

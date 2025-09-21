@@ -3,7 +3,7 @@ const bcrypt = require('bcrypt'); // for hashing passwords
 const crypto = require('crypto')
 const jwt = require('jsonwebtoken'); // for authentication tokens
 const { generateTokenAndSetCookie } = require('../utils/generateTokenAndSetCookie');
-const { sendVerificationEmail, sendPasswordResetEmail } = require('../mailtrap/emails');
+const { sendVerificationEmail, sendPasswordResetEmail } = require('../resendEmailVerification/email');
 
 // Signup controller
 exports.signup = async (req, res) => {
@@ -19,32 +19,29 @@ exports.signup = async (req, res) => {
             return res.status(400).json({ message: "Email already in use" });
         }
 
-        // Hash password
         const hashedPassword = await bcrypt.hash(password, 10);
         const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
 
-        // Create new user
         const user = await User.create({
             fullName,
             email,
             password: hashedPassword,
             verificationToken,
-            verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000
+            verificationTokenExpiresAt: Date.now() + 24 * 60 * 60 * 1000,
         });
 
-        // JWT cookie
         generateTokenAndSetCookie(res, user._id);
 
+        // Send email after user creation
         await sendVerificationEmail(user.email, verificationToken);
 
-        // Respond without password
         res.status(201).json({
             success: true,
-            message: "User created successfully",
-            user: { ...user._doc, password: undefined }
+            message: "User created successfully. Verification email sent.",
+            user: { ...user._doc, password: undefined },
         });
-
     } catch (error) {
+        console.error("Signup Error:", error);
         res.status(500).json({ message: "Error registering user", error: error.message });
     }
 };
@@ -173,12 +170,11 @@ exports.resetPassword = async (req, res) => {
     }
 };
 
-
-
-
 // Logout controller (optional, just for client-side token removal)
 exports.logout = async (req, res) => {
     // Usually handled on client by deleting JWT token
     res.clearCookie("token")
     res.status(200).json({ message: "Logout successful" });
 };
+
+

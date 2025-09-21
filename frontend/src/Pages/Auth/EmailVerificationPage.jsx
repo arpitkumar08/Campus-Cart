@@ -2,13 +2,15 @@ import React, { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import toast from "react-hot-toast";
+import { useAuthStore } from "../../store/authStore";
+
 
 const EmailVerificationPage = () => {
   const [code, setCode] = useState(["", "", "", "", "", ""]);
   const inputRefs = useRef([]);
   const navigate = useNavigate();
 
-  //   const {error, isLoading, verifyEmail} = useAuthStore()
+  const { error, isLoading, verifyEmail } = useAuthStore()
 
   const handleChange = (index, value) => {
     if (/^\d?$/.test(value)) {
@@ -45,19 +47,18 @@ const EmailVerificationPage = () => {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    // const verificationCode = code.join("");
-
-    // try {
-    //   await verifyEmail(verificationCode)
-    //   navigate('/')
-    //   toast.success("Email Verified Successfully")
-
-    // } catch (error) {
-    //   console.log(error);
-
-    // }
+    if (e) e.preventDefault();
+    const verificationCode = code.join("");
+    try {
+      await verifyEmail(verificationCode);
+      navigate("/");
+      toast.success("Email Verified Successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response?.data?.message || "Verification failed");
+    }
   };
+
 
   useEffect(() => {
     if (code.every((digit) => digit !== "")) {
@@ -104,15 +105,16 @@ const EmailVerificationPage = () => {
             ))}
           </div>
 
-          {/* {error && <p className="text-red-500 font-semibold mt-2">{error}</p>} */}
+          {error && <p className="text-red-500 font-semibold mt-2">{error}</p>}
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            // disabled={isLoading || code.some((digit) => !digit)}
+            disabled={isLoading || code.some((digit) => !digit)}
             className="w-full py-3 px-4 text-white font-semibold rounded-lg shadow-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 transition-all mt-4 cursor-pointer"
             type="submit"
           >
-            Verify
+            {isLoading ? "Verifying..." : "Verify Email"}
+
           </motion.button>
         </form>
       </motion.div>
