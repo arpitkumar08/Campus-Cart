@@ -5,6 +5,10 @@ import Signup from "./pages/Auth/Signup";
 import Home from "./pages/Home";
 import ForgotPasswordPage from "./pages/Auth/ForgotPasswordPage";
 import EmailVerificationPage from "./pages/Auth/EmailVerificationPage";
+import ResetPasswordPage from "./Pages/Auth/ResetPasswordPage";
+
+import { Toaster } from "react-hot-toast";
+
 
 const App = () => {
   return (
@@ -24,8 +28,12 @@ const App = () => {
 
         {/* Verify Email Page */}
         <Route path="/verify-email" element={<EmailVerificationPage />} />
+
+        <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
         
       </Routes>
+
+      <Toaster />
     </Router>
   );
 };

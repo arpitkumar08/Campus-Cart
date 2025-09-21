@@ -5,16 +5,18 @@ import { Link } from 'react-router-dom'
 import { FaArrowLeft } from "react-icons/fa"
 import { Loader } from "lucide-react"
 import Input from '../../Components/Input'
+import { useAuthStore } from '../../store/authStore'
+
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("")
   const [isSubmitted, setIsSubmitted] = useState(false)
 
-  // const { isLoading, forgotPassword } = useAuthStore()
+  const { isLoading, forgotPassword } = useAuthStore()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-    // await forgotPassword(email)
+    await forgotPassword(email)
     setIsSubmitted(true)
   }
 
@@ -52,12 +54,11 @@ const ForgotPasswordPage = () => {
                 className="w-full py-3 px-4 text-white font-semibold rounded-lg shadow-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 transition-all mt-4 cursor-pointer"
                 type="submit"
               >
-                {/* {isLoading ? (
+                {isLoading ? (
                   <Loader className="size-6 animate-spin mx-auto" />
                 ) : (
                   "Send Reset Link"
-                )} */}
-                Send Reset Link
+                )}
               </motion.button>
             </form>
           ) : (
