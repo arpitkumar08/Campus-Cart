@@ -16,23 +16,31 @@ const Login = () => {
     const { login, isLoading } = useAuthStore()
 
     const handleSubmit = async (e) => {
-        e.preventDefault()
+        e.preventDefault();
 
         if (!email || !password) {
-            setError("Please fill in all fields")
-            return
+            setError("Please fill in all fields");
+            return;
         }
 
-        setError("")
-        // TODO: integrate login logic
+        setError(""); // reset previous error
+
         try {
-            await login(email, password)
-        } catch (error) {
-            console.log(error)
+            await login(email, password);
+            navigate("/"); // only navigate if login succeeds
+        } catch (err) {
+            console.log("Login failed:", err);
+            // If your backend sends { success: false, message: "Invalid credentials" }
+            if (err.response && err.response.data && err.response.data.message) {
+                setError(err.response.data.message);
+            } else {
+                setError("Something went wrong. Please try again.");
+            }
         }
 
         navigate("/")
-    }
+    };
+
 
     // Variants for staggered animation
     const formVariants = {

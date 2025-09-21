@@ -49,46 +49,41 @@ exports.signup = async (req, res) => {
 // Login controller
 exports.login = async (req, res) => {
     const { email, password } = req.body;
+    console.log("Login attempt:", { email, password: password ? "******" : null });
 
     try {
-        if (!email || !password) {
-            return res.status(400).json({ message: "Email and password are required" });
-        }
-
         const user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({ message: "Invalid email or password" });
+            console.log("Login failed: User not found for email:", email);
+            return res.status(400).json({ success: false, message: "Invalid credentials" });
         }
+        console.log("User found:", { id: user._id, email: user.email });
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            return res.status(400).json({ message: "Invalid email or password" });
+            console.log("Login failed: Password mismatch for email:", email);
+            return res.status(400).json({ success: false, message: "Invalid credentials" });
         }
+        console.log("Password matched for user:", email);
 
-        // Create JWT token
-        const token = jwt.sign(
-            { id: user._id },
-            process.env.JWT_SECRET,
-            { expiresIn: '7d' } // ✅ longer expiry if needed
-        );
+        generateTokenAndSetCookie(res, user._id);
+        console.log("JWT token generated and cookie set for user:", email);
 
-        // Optionally set cookie (if you want httpOnly sessions)
-        // generateTokenAndSetCookie(res, user._id);
+        user.lastLogin = new Date();
+        await user.save();
+        console.log("User lastLogin updated:", user.lastLogin);
 
         res.status(200).json({
             success: true,
-            message: "Login successful",
-            token,
+            message: "Logged in successfully",
             user: {
-                id: user._id,
-                fullName: user.fullName,
-                email: user.email,
-                isVerified: user.isVerified
-            }
+                ...user._doc,
+                password: undefined,
+            },
         });
     } catch (error) {
-        console.error("Login Error:", error);
-        res.status(500).json({ message: "Error logging in", error: error.message });
+        console.log("Error in login:", error);
+        res.status(400).json({ success: false, message: error.message });
     }
 };
 

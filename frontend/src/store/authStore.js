@@ -40,7 +40,14 @@ export const useAuthStore = create((set) => ({
     set({ isLoading: true, error: null });
     try {
       console.log("🔹 Login payload:", { email, password });
+
       const response = await axios.post(`${API_URL}/login`, { email, password });
+      set({
+        isAuthenticated: true,
+        user: response.data.user,
+        error: null,
+        isLoading: false,
+      });
       console.log("✅ Login response:", response.data);
 
       const { token, user } = response.data;
