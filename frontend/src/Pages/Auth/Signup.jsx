@@ -3,7 +3,7 @@ import AuthLayout from '../../Components/AuthLayout'
 import { motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import Input from '../../Components/Input'
-import { useAuthStore } from '../../store/authStore'
+// import { useAuthStore } from '../../store/authStore'
 import PasswordStrengthMeter from '../../Components/PasswordStrengthMeter'
 const Signup = () => {
 
@@ -14,7 +14,7 @@ const Signup = () => {
 
   const navigate = useNavigate()
 
-  const { signup, isLoading } = useAuthStore()
+  // const { signup, isLoading } = useAuthStore()
 
   const handleSubmit = async (e) => {
     e.preventDefault()

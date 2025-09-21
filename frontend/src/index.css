@@ -1,1 +1,13 @@
 @import "tailwindcss";
+
+
+@layer components {
+    .input-box {
+        @apply w-full flex justify-between gap-3 text-sm text-black dark:text-white bg-slate-100 dark:bg-gray-800 rounded px-4 py-3 mb-4 mt-3 border border-slate-200 dark:border-gray-700 outline-none;
+
+    }
+
+    .btn-primary {
+        @apply w-full text-sm font-medium text-white bg-purple-500 dark:bg-purple-600 shadow-purple-600/5 p-[10px] rounded-md my-1
+    }
+}
