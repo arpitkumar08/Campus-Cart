@@ -65,14 +65,33 @@ exports.login = async (req, res) => {
             return res.status(400).json({ message: "Invalid email or password" });
         }
 
-        // Create JWT token (optional)
-        const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, { expiresIn: '1h' });
+        // Create JWT token
+        const token = jwt.sign(
+            { id: user._id },
+            process.env.JWT_SECRET,
+            { expiresIn: '7d' } // ✅ longer expiry if needed
+        );
 
-        res.status(200).json({ message: "Login successful", token });
+        // Optionally set cookie (if you want httpOnly sessions)
+        // generateTokenAndSetCookie(res, user._id);
+
+        res.status(200).json({
+            success: true,
+            message: "Login successful",
+            token,
+            user: {
+                id: user._id,
+                fullName: user.fullName,
+                email: user.email,
+                isVerified: user.isVerified
+            }
+        });
     } catch (error) {
+        console.error("Login Error:", error);
         res.status(500).json({ message: "Error logging in", error: error.message });
     }
 };
+
 
 // Verify Email
 exports.verifyEmail = async (req, res) => {

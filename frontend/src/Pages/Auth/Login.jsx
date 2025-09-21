@@ -3,6 +3,8 @@ import { Link, useNavigate } from 'react-router-dom'
 import { motion } from 'framer-motion'
 import AuthLayout from '../../Components/AuthLayout'
 import Input from '../../Components/Input'
+import { useAuthStore } from '../../store/authStore'
+import { Loader } from 'lucide-react'
 
 const Login = () => {
     const [email, setEmail] = useState("")
@@ -10,7 +12,10 @@ const Login = () => {
     const [error, setError] = useState("")
     const navigate = useNavigate()
 
-    const handleSubmit = (e) => {
+
+    const { login, isLoading } = useAuthStore()
+
+    const handleSubmit = async (e) => {
         e.preventDefault()
 
         if (!email || !password) {
@@ -20,7 +25,13 @@ const Login = () => {
 
         setError("")
         // TODO: integrate login logic
-        navigate("/dashboard")
+        try {
+            await login(email, password)
+        } catch (error) {
+            console.log(error)
+        }
+
+        navigate("/")
     }
 
     // Variants for staggered animation
@@ -88,9 +99,10 @@ const Login = () => {
                         animate="visible"
                         custom={3}
                         type="submit"
+                        disabled={isLoading}
                         className="w-full py-2.5 cursor-pointer rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold tracking-wide shadow-md transition-all"
                     >
-                        LOGIN
+                        {isLoading ? <Loader className='animate-spin mx-auto' size={24} /> : "LOGIN"}
                     </motion.button>
 
                     <motion.p

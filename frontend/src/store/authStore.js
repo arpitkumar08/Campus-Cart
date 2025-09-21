@@ -42,12 +42,22 @@ export const useAuthStore = create((set) => ({
       console.log("🔹 Login payload:", { email, password });
       const response = await axios.post(`${API_URL}/login`, { email, password });
       console.log("✅ Login response:", response.data);
+
+      const { token, user } = response.data;
+
+      // ✅ Save token for future API calls
+      if (token) {
+        localStorage.setItem("token", token);
+        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      }
+
       set({
         isAuthenticated: true,
-        user: response.data.user,
+        user,
         error: null,
         isLoading: false,
       });
+
       return response.data;
     } catch (error) {
       console.error("❌ Login error:", error.response?.data || error.message);
@@ -58,6 +68,7 @@ export const useAuthStore = create((set) => ({
       throw error;
     }
   },
+
 
   logout: async () => {
     set({ isLoading: true, error: null });
