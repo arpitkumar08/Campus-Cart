@@ -1,0 +1,133 @@
+import React, { useState } from 'react'
+import { Link, useNavigate } from 'react-router-dom'
+import { motion } from 'framer-motion'
+import AuthLayout from '../../Components/AuthLayout'
+import Input from '../../Components/Input'
+
+const Login = () => {
+    const [email, setEmail] = useState("")
+    const [password, setPassword] = useState("")
+    const [error, setError] = useState("")
+    const navigate = useNavigate()
+
+    const handleSubmit = (e) => {
+        e.preventDefault()
+
+        if (!email || !password) {
+            setError("Please fill in all fields")
+            return
+        }
+
+        setError("")
+        // TODO: integrate login logic
+        navigate("/dashboard")
+    }
+
+    // Variants for staggered animation
+    const formVariants = {
+        hidden: { opacity: 0, y: 20 },
+        visible: (i) => ({
+            opacity: 1,
+            y: 0,
+            transition: { delay: i * 0.2, duration: 0.6, ease: 'easeOut' },
+        }),
+    }
+
+    return (
+        <AuthLayout>
+            <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.8, ease: 'easeOut' }}
+                className="w-full max-w-md mx-auto flex flex-col items-center justify-center min-h-[80vh] space-y-8"
+            >
+                <motion.h3
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.3, duration: 0.7 }}
+                    className="text-3xl font-bold bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent"
+                >
+                    Welcome Back!!
+                </motion.h3>
+
+                <form className="w-full space-y-5" onSubmit={handleSubmit}>
+                    <motion.div variants={formVariants} initial="hidden" animate="visible" custom={1}>
+                        <Input
+                            value={email}
+                            placeholder="example@demo.com"
+                            label="Email Address"
+                            onChange={(e) => setEmail(e.target.value)}
+                            type="email"
+                        />
+                    </motion.div>
+
+                    <motion.div variants={formVariants} initial="hidden" animate="visible" custom={2}>
+                        <Input
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            label="Password"
+                            placeholder="Min 8 Characters"
+                            type="password"
+                        />
+                    </motion.div>
+
+                    {error && (
+                        <motion.p
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{ delay: 0.2 }}
+                            className="text-red-400 text-sm"
+                        >
+                            {error}
+                        </motion.p>
+                    )}
+
+                    <motion.button
+                        variants={formVariants}
+                        initial="hidden"
+                        animate="visible"
+                        custom={3}
+                        type="submit"
+                        className="w-full py-2.5 cursor-pointer rounded-lg bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-semibold tracking-wide shadow-md transition-all"
+                    >
+                        LOGIN
+                    </motion.button>
+
+                    <motion.p
+                        variants={formVariants}
+                        initial="hidden"
+                        animate="visible"
+                        custom={4}
+                        className="text-[13px] text-gray-400 mt-3"
+                    >
+                        Forgot Password?{" "}
+                        <Link
+                            className="font-medium text-purple-400 hover:underline"
+                            to="/forgot-password"
+                        >
+                            Click here
+                        </Link>
+                    </motion.p>
+
+                    <motion.p
+                        variants={formVariants}
+                        initial="hidden"
+                        animate="visible"
+                        custom={5}
+                        className="text-gray-400 text-sm mt-3"
+                    >
+                        Don’t have an account?{" "}
+                        <span
+                            onClick={() => navigate('/signup')}
+                            className="text-purple-400 cursor-pointer hover:underline"
+                        >
+                            Sign Up
+                        </span>
+                    </motion.p>
+                </form>
+            </motion.div>
+        </AuthLayout>
+    )
+}
+
+export default Login
