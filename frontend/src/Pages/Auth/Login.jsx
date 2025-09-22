@@ -27,7 +27,6 @@ const Login = () => {
 
         try {
             const response = await login(email, password); // store the result
-            console.log("Login response:", response); // check what you get
 
             // Make sure your login function returns the token
             // localStorage.setItem("token", response.token);

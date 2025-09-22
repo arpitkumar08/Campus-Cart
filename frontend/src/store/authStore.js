@@ -35,7 +35,6 @@ export const useAuthStore = create((set) => ({
   login: async (email, password) => {
     set({ isLoading: true, error: null });
     try {
-      console.log("🔹 Login payload:", { email, password });
 
       const response = await axios.post(`${API_URL}/login`, { email, password });
       set({
@@ -66,9 +65,7 @@ export const useAuthStore = create((set) => ({
   logout: async () => {
     set({ isLoading: true, error: null });
     try {
-      console.log("🔹 Logging out...");
       const response = await axios.post(`${API_URL}/logout`);
-      console.log("✅ Logout response:", response.data);
       set({ user: null, isAuthenticated: false, error: null, isLoading: false });
       return response.data;
     } catch (error) {
@@ -104,7 +101,7 @@ export const useAuthStore = create((set) => ({
       set({ user: response.data.user, isAuthenticated: true, isCheckingAuth: false });
       return response.data;
     } catch (error) {
-      console.error("❌ Check Auth error:", error.response?.data || error.message);
+      // console.error("❌ Check Auth error:", error.response?.data || error.message);
       set({ error: null, isCheckingAuth: false, isAuthenticated: false });
     }
   },

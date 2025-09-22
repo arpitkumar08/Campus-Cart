@@ -5,15 +5,23 @@ import Avatar from './ui-header/Avatar';
 import DropdownMenu from './ui-header/DropdownMenu';
 import DropdownMenuItem from './ui-header/DropdownMenuItem';
 import { useAuthStore } from '../store/authStore';
+import Filter from './Filter';
 // import ThemeToggle from './ui/ThemeToggle'; // optional
 
 const Header = () => {
 
     const user = useAuthStore((state) => state.user);
-    console.log("This is user:",user);
-    
+    // console.log("This is user:",user);
 
-    
+    const { logout } = useAuthStore()
+    const handleLogout = async () => {
+
+        await logout();
+    }
+
+
+
+
 
     const [searchQuery, setSearchQuery] = useState('');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);

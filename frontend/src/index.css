@@ -11,31 +11,3 @@
         @apply w-full text-sm font-medium text-white bg-purple-500 dark:bg-purple-600 shadow-purple-600/5 p-[10px] rounded-md my-1
     }
 }
-/* Scrollbar for modern browsers */
-::-webkit-scrollbar {
-    width: 12px; /* width of the vertical scrollbar */
-    height: 12px; /* height of horizontal scrollbar */
-}
-
-::-webkit-scrollbar-track {
-    background: transparent; /* dark semi-transparent track */
-    border-radius: 10px;
-    backdrop-filter: blur(3px); /* matches the modal blur effect */
-}
-
-::-webkit-scrollbar-thumb {
-    background: rgba(200, 200, 200, 0.2); /* light grayish thumb */
-    border-radius: 10px;
-    border: 2px solid rgba(50, 50, 50, 0.3); /* gives a slight glossy border */
-    transition: background 0.3s ease;
-}
-
-::-webkit-scrollbar-thumb:hover {
-    background: rgba(200, 200, 200, 0.5); /* brighter on hover */
-}
-
-/* Firefox scrollbar */
-* {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(200, 200, 200, 0.2) rgba(50, 50, 50, 0.3);
-}
