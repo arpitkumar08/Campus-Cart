@@ -5,7 +5,7 @@ import Avatar from './ui-header/Avatar';
 import DropdownMenu from './ui-header/DropdownMenu';
 import DropdownMenuItem from './ui-header/DropdownMenuItem';
 import { useAuthStore } from '../store/authStore';
-import Filter from './Filter';
+import Filter from './Filter/Filter';
 // import ThemeToggle from './ui/ThemeToggle'; // optional
 
 const Header = () => {
@@ -19,10 +19,6 @@ const Header = () => {
         await logout();
     }
 
-
-
-
-
     const [searchQuery, setSearchQuery] = useState('');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -33,9 +29,7 @@ const Header = () => {
 
                     {/* Logo */}
                     <div className="flex items-center space-x-3">
-                        <div className="h-10 w-10 rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 flex items-center justify-center shadow-lg">
-                            <span className="text-white font-bold text-lg">CE</span>
-                        </div>
+                        
                         <span className="font-bold text-lg text-white/90 tracking-wide">Campus Exchange</span>
                     </div>
 
@@ -82,7 +76,7 @@ const Header = () => {
                                         <DropdownMenuItem>Settings</DropdownMenuItem>
                                         <div className="border-t border-gray-500/30"></div>
                                         <DropdownMenuItem>
-                                            <button onClick={handleLogout} className="w-full text-left">
+                                            <button onClick={handleLogout} className="w-full text-red-500 text-left">
                                                 Log out
                                             </button>
                                         </DropdownMenuItem>
