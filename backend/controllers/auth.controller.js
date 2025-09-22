@@ -54,24 +54,18 @@ exports.login = async (req, res) => {
     try {
         const user = await User.findOne({ email });
         if (!user) {
-            console.log("Login failed: User not found for email:", email);
             return res.status(400).json({ success: false, message: "Invalid credentials" });
         }
-        console.log("User found:", { id: user._id, email: user.email });
 
         const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
-            console.log("Login failed: Password mismatch for email:", email);
             return res.status(400).json({ success: false, message: "Invalid credentials" });
         }
-        console.log("Password matched for user:", email);
 
         generateTokenAndSetCookie(res, user._id);
-        console.log("JWT token generated and cookie set for user:", email);
 
         user.lastLogin = new Date();
         await user.save();
-        console.log("User lastLogin updated:", user.lastLogin);
 
         res.status(200).json({
             success: true,
@@ -183,6 +177,16 @@ exports.resetPassword = async (req, res) => {
         res.status(400).json({ success: false, message: error.message });
     }
 };
+// authController.js
+exports.getCurrentUser = async (req, res) => {
+    try {
+        const userId = req.user.id; // from middleware that verifies JWT cookie
+        const user = await User.findById(userId).select("-password");
+        res.status(200).json({ success: true, user });
+    } catch (err) {
+        res.status(401).json({ success: false, message: "Not authenticated" });
+    }
+};
 
 // Logout controller (optional, just for client-side token removal)
 exports.logout = async (req, res) => {
@@ -190,5 +194,17 @@ exports.logout = async (req, res) => {
     res.clearCookie("token")
     res.status(200).json({ message: "Logout successful" });
 };
+
+// controllers/auth.controller.js
+exports.checkAuth = (req, res) => {
+  if (req.user) {
+    // Assuming you are using session or middleware to attach user
+    return res.status(200).json({ user: req.user });
+  } else {
+    return res.status(401).json({ message: "Not authenticated" });
+  }
+};
+
+
 
 

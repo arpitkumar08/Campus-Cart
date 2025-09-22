@@ -26,8 +26,13 @@ const Login = () => {
         setError(""); // reset previous error
 
         try {
-            await login(email, password);
-            navigate("/");
+            const response = await login(email, password); // store the result
+            console.log("Login response:", response); // check what you get
+
+            // Make sure your login function returns the token
+            // localStorage.setItem("token", response.token);
+
+            navigate("/"); // redirect to home
         } catch (err) {
             if (err.response && err.response.data && err.response.data.message) {
                 setError(err.response.data.message);
@@ -35,7 +40,6 @@ const Login = () => {
                 setError("Something went wrong. Please try again.");
             }
         }
-
     };
 
 

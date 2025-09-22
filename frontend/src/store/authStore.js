@@ -3,7 +3,7 @@ import axios from "axios";
 
 // Set API URL based on environment
 const API_URL =
-  import.meta.env.MODE === "development" ? "http://localhost:5000/api/auth": "/api/auth";
+  import.meta.env.MODE === "development" ? "http://localhost:5000/api/auth" : "/api/auth";
 
 // Include credentials if backend uses cookies
 axios.defaults.withCredentials = true;
@@ -46,20 +46,10 @@ export const useAuthStore = create((set) => ({
       });
       console.log("✅ Login response:", response.data);
 
-      const { token, user } = response.data;
+      const { user } = response.data;
 
-      // ✅ Save token for future API calls
-      if (token) {
-        localStorage.setItem("token", token);
-        axios.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-      }
 
-      set({
-        isAuthenticated: true,
-        user,
-        error: null,
-        isLoading: false,
-      });
+      set({ isAuthenticated: true, user, error: null, isLoading: false, });
 
       return response.data;
     } catch (error) {
@@ -110,7 +100,8 @@ export const useAuthStore = create((set) => ({
     set({ isCheckingAuth: true, error: null });
     try {
       console.log("🔹 Checking authentication...");
-      const response = await axios.get(`${API_URL}/check-auth`);
+
+      const response = await axios.get(`${API_URL}/check-auth`, { withCredentials: true });
       console.log("✅ Check Auth response:", response.data);
       set({ user: response.data.user, isAuthenticated: true, isCheckingAuth: false });
       return response.data;
@@ -119,6 +110,7 @@ export const useAuthStore = create((set) => ({
       set({ error: null, isCheckingAuth: false, isAuthenticated: false });
     }
   },
+
 
   forgotPassword: async (email) => {
     set({ isLoading: true, error: null });
@@ -156,3 +148,5 @@ export const useAuthStore = create((set) => ({
     }
   },
 }));
+
+export default useAuthStore;
