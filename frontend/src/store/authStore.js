@@ -3,9 +3,7 @@ import axios from "axios";
 
 // Set API URL based on environment
 const API_URL =
-  import.meta.env.MODE === "development"
-    ? "http://localhost:5000/api/auth"
-    : "/api/auth";
+  import.meta.env.MODE === "development" ? "http://localhost:5000/api/auth": "/api/auth";
 
 // Include credentials if backend uses cookies
 axios.defaults.withCredentials = true;
@@ -23,11 +21,9 @@ export const useAuthStore = create((set) => ({
     try {
       console.log("🔹 Signup payload:", { fullName, email, password });
       const response = await axios.post(`${API_URL}/signup`, { fullName, email, password });
-      console.log("✅ Signup response:", response.data);
       set({ user: response.data.user, isAuthenticated: true, isLoading: false });
       return response.data;
     } catch (error) {
-      console.error("❌ Signup error:", error.response?.data || error.message);
       set({
         error: error.response?.data?.message || "Error signing up",
         isLoading: false,

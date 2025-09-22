@@ -27,10 +27,8 @@ const Login = () => {
 
         try {
             await login(email, password);
-            navigate("/"); // only navigate if login succeeds
+            navigate("/");
         } catch (err) {
-            console.log("Login failed:", err);
-            // If your backend sends { success: false, message: "Invalid credentials" }
             if (err.response && err.response.data && err.response.data.message) {
                 setError(err.response.data.message);
             } else {
@@ -38,7 +36,6 @@ const Login = () => {
             }
         }
 
-        navigate("/")
     };
 
 
