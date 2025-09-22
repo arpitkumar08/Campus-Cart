@@ -49,7 +49,6 @@ exports.signup = async (req, res) => {
 // Login controller
 exports.login = async (req, res) => {
     const { email, password } = req.body;
-    console.log("Login attempt:", { email, password: password ? "******" : null });
 
     try {
         const user = await User.findOne({ email });

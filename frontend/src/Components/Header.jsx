@@ -5,15 +5,31 @@ import Avatar from './ui-home/Avatar';
 import DropdownMenu from './ui-home/DropdownMenu';
 import DropdownMenuItem from './ui-home/DropdownMenuItem';
 import { useAuthStore } from '../store/authStore';
+import { useNavigate } from 'react-router-dom';
 // import ThemeToggle from './ui/ThemeToggle'; // optional
 
 const Header = () => {
 
     const user = useAuthStore((state) => state.user);
-    console.log("This is user:",user);
-    
 
-    
+
+    // console.log("This is user:",user);
+
+    const navigate = useNavigate()
+
+    const { logout } = useAuthStore()
+    const handleLogout = async () => {
+        try {
+            console.log("handleLogout called.")
+            await logout()
+            navigate('/login')
+        } catch (error) {
+            console.log(error)
+        }
+
+    }
+
+
 
     const [searchQuery, setSearchQuery] = useState('');
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -70,7 +86,11 @@ const Header = () => {
                                         <DropdownMenuItem>Favorites</DropdownMenuItem>
                                         <DropdownMenuItem>Settings</DropdownMenuItem>
                                         <div className="border-t border-gray-500/30"></div>
-                                        <DropdownMenuItem>Log out</DropdownMenuItem>
+                                        <DropdownMenuItem>
+                                            <button onClick={handleLogout} className="w-full text-left">
+                                                Log out
+                                            </button>
+                                        </DropdownMenuItem>
                                     </div>
                                 )
                             }}
