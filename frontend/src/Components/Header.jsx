@@ -70,6 +70,7 @@ const Header = () => {
 
               {/* Profile Dropdown */}
               <DropdownMenu
+                className="!bg-gray-800 !rounded-lg !shadow-xl !border !border-gray-600"
                 children={{
                   trigger: (
                     <Avatar
@@ -79,31 +80,41 @@ const Header = () => {
                     />
                   ),
                   content: (
-                    <div>
-                      <div className="p-2 border-b border-gray-500/30">
-                        <p className="text-sm font-medium">
+                    <div className="!bg-gray-800 !rounded-lg !shadow-xl !border !border-gray-600 min-w-48 overflow-hidden">
+                      <div className="p-3 border-b border-gray-600 !bg-gray-800">
+                        <p className="text-sm font-medium text-white">
                           {user?.fullName || 'Guest'}
                         </p>
                         <p className="text-xs text-gray-300">{user?.email}</p>
                       </div>
-                      <DropdownMenuItem>Profile</DropdownMenuItem>
-                      <DropdownMenuItem>My Listings</DropdownMenuItem>
-                      <DropdownMenuItem>
-                        <button onClick={handleProductUpload}>
-                          Upload Product
-                        </button>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem>Favorites</DropdownMenuItem>
-                      <DropdownMenuItem>Settings</DropdownMenuItem>
-                      <div className="border-t border-gray-500/30"></div>
-                      <DropdownMenuItem>
-                        <button
-                          onClick={handleLogout}
-                          className="w-full text-red-500 text-left"
-                        >
-                          Log out
-                        </button>
-                      </DropdownMenuItem>
+                      <div className="py-1 !bg-gray-800">
+                        <DropdownMenuItem className="!text-gray-200 !hover:bg-gray-700 !bg-transparent px-3 py-2 cursor-pointer">
+                          Profile
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="!text-gray-200 !hover:bg-gray-700 !bg-transparent px-3 py-2 cursor-pointer">
+                          My Listings
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="!text-gray-200 !hover:bg-gray-700 !bg-transparent px-3 py-2 cursor-pointer">
+                          <button onClick={handleProductUpload} className="w-full text-left">
+                            Upload Product
+                          </button>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="!text-gray-200 !hover:bg-gray-700 !bg-transparent px-3 py-2 cursor-pointer">
+                          Favorites
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="!text-gray-200 !hover:bg-gray-700 !bg-transparent px-3 py-2 cursor-pointer">
+                          Settings
+                        </DropdownMenuItem>
+                        <div className="border-t border-gray-600 my-1"></div>
+                        <DropdownMenuItem className="!text-gray-200 !hover:bg-gray-700 !bg-transparent px-3 py-2 cursor-pointer">
+                          <button
+                            onClick={handleLogout}
+                            className="w-full text-red-400 text-left hover:text-red-300"
+                          >
+                            Log out
+                          </button>
+                        </DropdownMenuItem>
+                      </div>
                     </div>
                   ),
                 }}
