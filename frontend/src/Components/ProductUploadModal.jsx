@@ -65,7 +65,8 @@ const ProductUploadModal = ({ onClose }) => {
             return;
         }
 
-        console.log("Product Submitted:", formData);
+        
+
         onClose();
     };
 
