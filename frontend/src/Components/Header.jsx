@@ -6,16 +6,25 @@ import DropdownMenu from './ui-header/DropdownMenu';
 import DropdownMenuItem from './ui-header/DropdownMenuItem';
 import { useAuthStore } from '../store/authStore';
 import Filter from './Filter/Filter';
+import { useNavigate } from "react-router-dom";
 import ProductUploadModal from './ProductUploadModal';
 // import ThemeToggle from './ui/ThemeToggle'; // optional
 
 const Header = () => {
   const user = useAuthStore((state) => state.user);
-  const { logout } = useAuthStore();
+  const navigate = useNavigate();
 
+  const { logout } = useAuthStore();
+  
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isUploadOpen, setIsUploadOpen] = useState(false); // ✅ Modal control
+  const [isUploadOpen, setIsUploadOpen] = useState(false); 
+  
+
+  const getMyListing = async () => {
+        navigate("/mylisting"); // ✅ Go to MyListings page
+
+  }
 
   const handleLogout = async () => {
     await logout();
@@ -88,23 +97,24 @@ const Header = () => {
                         <p className="text-xs text-gray-300">{user?.email}</p>
                       </div>
                       <div className="py-1 !bg-gray-800 cursor-pointer">
+                       
                         <DropdownMenuItem className="!text-gray-200 !hover:bg-gray-700 !bg-transparent px-3 py-2 cursor-pointer">
-                          Profile
+                          <button 
+                          onClick={getMyListing}
+                          className='cursor-pointer'
+                          >
+                            My Listings
+                          </button>
                         </DropdownMenuItem>
                         <DropdownMenuItem className="!text-gray-200 !hover:bg-gray-700 !bg-transparent px-3 py-2 cursor-pointer">
-                          My Listings
-                        </DropdownMenuItem>
-                        <DropdownMenuItem className="!text-gray-200 !hover:bg-gray-700 !bg-transparent px-3 py-2 cursor-pointer">
-                          <button onClick={handleProductUpload} className="w-full text-left">
+                          <button onClick={handleProductUpload} className="w-full text-left cursor-pointer">
                             Upload Product
                           </button>
                         </DropdownMenuItem>
                         <DropdownMenuItem className="!text-gray-200 !hover:bg-gray-700 !bg-transparent px-3 py-2 cursor-pointer">
                           Favorites
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="!text-gray-200 !hover:bg-gray-700 !bg-transparent px-3 py-2 cursor-pointer">
-                          Settings
-                        </DropdownMenuItem>
+                       
                         <div className="border-t border-gray-600 my-1"></div>
                         <DropdownMenuItem className="!text-gray-200 !hover:bg-gray-700 !bg-transparent px-3 py-2 cursor-pointer">
                           <button

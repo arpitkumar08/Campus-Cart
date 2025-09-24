@@ -9,6 +9,7 @@ import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "./components/ProtectedRoute";
 import useAuthStore from "./store/authStore";
 import { useEffect } from "react";
+import MyListings from "./Components/MyListing";
 
 const App = () => {
 
@@ -25,6 +26,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/mylisting"
+          element={
+            <ProtectedRoute>
+              <MyListings />
             </ProtectedRoute>
           }
         />

@@ -9,20 +9,21 @@ const API_URL =
 
 const ADD_PRODUCT_URL = `${API_URL}/addproduct`;
 const DELETE_PRODUCT_URL = (id) => `${API_URL}/deleteproduct/${id}`;
+const MY_LISTED_PRODUCTS_URL = `${API_URL}/mylisting`; // ✅ new endpoint
 
 export const useProductStore = create((set) => ({
-  products: [],
+  products: [],        // All products
+  myProducts: [],      // ✅ Only products added by logged-in user
   product: null,
   isLoading: false,
   error: null,
 
-  // Fetch all products
+  // ✅ Fetch all products
   fetchProducts: async () => {
     set({ isLoading: true, error: null });
     try {
       const response = await axios.get(API_URL);
-      console.log("🟢 Products fetched from backend:", response.data); // <-- Add this line
-
+      console.log("🟢 Products fetched from backend:", response.data);
       set({ products: response.data, isLoading: false });
     } catch (error) {
       set({
@@ -33,18 +34,37 @@ export const useProductStore = create((set) => ({
     }
   },
 
+  fetchMyListedProducts: async (ownerId) => {
+    set({ isLoading: true, error: null });
+    try {
+      const response = await axios.get(MY_LISTED_PRODUCTS_URL, {
+        params: { owner: ownerId },
+      });
 
-  // Add a product (supports images via FormData)
-  // Add a product (now sends JSON with Cloudinary URLs)
+      // Extract the array
+      set({ myProducts: response.data.products, isLoading: false });
+    } catch (error) {
+      set({
+        error:
+          error.response?.data?.message ||
+          "Error fetching your listed products",
+        isLoading: false,
+      });
+    }
+  },
+
+
+  // ✅ Add a product
   addProduct: async (productData) => {
     set({ isLoading: true, error: null });
     try {
       const response = await axios.post(ADD_PRODUCT_URL, productData, {
-        headers: { "Content-Type": "application/json" }, // ✅ JSON now
+        headers: { "Content-Type": "application/json" },
       });
 
       set((state) => ({
-        products: [...state.products, response.data.product],
+        products: [response.data.product, ...state.products],
+        myProducts: [response.data.product, ...state.myProducts], // add to personal list too
         isLoading: false,
       }));
 
@@ -60,14 +80,14 @@ export const useProductStore = create((set) => ({
     }
   },
 
-
-  // Delete a product
+  // ✅ Delete a product
   deleteProduct: async (id) => {
     set({ isLoading: true, error: null });
     try {
       await axios.delete(DELETE_PRODUCT_URL(id));
       set((state) => ({
         products: state.products.filter((p) => p._id !== id),
+        myProducts: state.myProducts.filter((p) => p._id !== id),
         isLoading: false,
       }));
       toast.success("✅ Product deleted successfully!");

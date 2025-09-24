@@ -23,7 +23,7 @@ const ProductUploadModal = ({ onClose }) => {
     images: [],
   });
 
-  const [loading, setLoading] = useState(false); // ✅ local loader
+  const [loading, setLoading] = useState(false);
 
   const categories = [
     "Electronics",
@@ -46,11 +46,12 @@ const ProductUploadModal = ({ onClose }) => {
     }));
   };
 
+  // Preserve selection order
   const handleMultipleImageChange = (files) => {
     if (files && files.length > 0) {
-      const newFiles = Array.from(files);
+      const newFiles = Array.from(files); // preserves order
       setFormData((prev) => {
-        const combinedFiles = [...prev.images, ...newFiles].slice(0, 3);
+        const combinedFiles = [...prev.images, ...newFiles].slice(0, 3); // max 3 images
         return { ...prev, images: combinedFiles };
       });
     }
@@ -72,9 +73,8 @@ const ProductUploadModal = ({ onClose }) => {
     }
 
     try {
-      setLoading(true); // ✅ start loader immediately
+      setLoading(true);
 
-      // 1️⃣ Upload images to Cloudinary
       const uploadedImageUrls = [];
       for (const image of formData.images) {
         const cloudData = new FormData();
@@ -90,7 +90,6 @@ const ProductUploadModal = ({ onClose }) => {
         uploadedImageUrls.push(file.secure_url);
       }
 
-      // 2️⃣ Prepare data for backend
       const data = {
         title: formData.title,
         description: formData.description,
@@ -103,16 +102,14 @@ const ProductUploadModal = ({ onClose }) => {
         images: uploadedImageUrls,
       };
 
-      // 3️⃣ Send to backend / MongoDB
       await addProduct(data);
-
       toast.success("Product uploaded successfully!");
       onClose();
     } catch (error) {
       console.error("Error uploading product:", error);
       toast.error(error.response?.data?.message || "Failed to upload product");
     } finally {
-      setLoading(false); // ✅ stop loader after everything
+      setLoading(false);
     }
   };
 
@@ -230,9 +227,7 @@ const ProductUploadModal = ({ onClose }) => {
                     type="file"
                     accept="image/*"
                     multiple
-                    onChange={(e) =>
-                      handleMultipleImageChange(e.target.files)
-                    }
+                    onChange={(e) => handleMultipleImageChange(e.target.files)}
                     className="block w-full text-sm text-gray-400
                       file:mr-3 file:py-2 file:px-4
                       file:rounded-lg file:border-0
@@ -243,18 +238,23 @@ const ProductUploadModal = ({ onClose }) => {
                   />
                 )}
 
+                {/* Image previews in order */}
                 {formData.images.length > 0 && (
-                  <div className="flex flex-wrap gap-2">
+                  <div className="flex flex-wrap gap-2 mt-2">
                     {formData.images.map((file, index) => (
                       <div
                         key={index}
-                        className="bg-gray-800 px-3 py-1 rounded-lg text-xs flex items-center gap-2"
+                        className="relative w-20 h-20 bg-gray-800 rounded-lg overflow-hidden flex items-center justify-center"
                       >
-                        <span className="truncate max-w-[100px]">{file.name}</span>
+                        <img
+                          src={URL.createObjectURL(file)}
+                          alt={file.name}
+                          className="w-full h-full object-cover"
+                        />
                         <button
                           type="button"
                           onClick={() => removeImage(index)}
-                          className="text-red-400 hover:text-red-300 font-bold"
+                          className="absolute top-1 right-1 text-red-400 hover:text-red-300 font-bold"
                         >
                           ×
                         </button>
@@ -276,7 +276,7 @@ const ProductUploadModal = ({ onClose }) => {
                   type="submit"
                   disabled={loading}
                   className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors 
-                    ${loading ? 'bg-purple-400 cursor-not-allowed' : 'bg-purple-700 hover:bg-purple-600'}`}
+                    ${loading ? "bg-purple-400 cursor-not-allowed" : "bg-purple-700 hover:bg-purple-600"}`}
                 >
                   {loading ? <Loader className="animate-spin mx-auto" size={20} /> : "Upload"}
                 </button>

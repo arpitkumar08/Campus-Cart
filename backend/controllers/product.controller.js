@@ -1,19 +1,37 @@
 const Product = require("../models/product.model");
 
+// ✅ Add a product
 exports.addProduct = async (req, res) => {
   try {
-    const { title, category, price, description, isNegotiable, condition, status = "Available", location, owner } = req.body;
+    const {
+      title,
+      category,
+      price,
+      description,
+      isNegotiable,
+      condition,
+      status = "Available",
+      location,
+      owner,
+    } = req.body;
 
-    // Convert fields
     const numericPrice = Number(price);
     const negotiable = isNegotiable === "true";
-
-    // Store uploaded files as buffers in MongoDB
-    const images = req.body.images || []
+    const images = req.body.images || [];
 
     // Validate required fields
-    if (!title || !category || !description || isNaN(numericPrice) || !condition || !location || !owner) {
-      return res.status(400).json({ message: "All required fields must be provided." });
+    if (
+      !title ||
+      !category ||
+      !description ||
+      isNaN(numericPrice) ||
+      !condition ||
+      !location ||
+      !owner
+    ) {
+      return res
+        .status(400)
+        .json({ message: "All required fields must be provided." });
     }
 
     // Check if product already exists for this user
@@ -41,34 +59,71 @@ exports.addProduct = async (req, res) => {
       message: "Product listed successfully.",
       product,
     });
-
   } catch (error) {
     console.error("Error in uploading product:", error);
-    res.status(500).json({ message: "Error in uploading product", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error in uploading product", error: error.message });
   }
 };
 
+// ✅ Delete product
 exports.deleteProduct = async (req, res) => {
   const { id } = req.params;
-
   try {
     const product = await Product.findById(id);
-    if (!product) return res.status(404).json({ message: "Product not found." });
+    if (!product)
+      return res.status(404).json({ message: "Product not found." });
 
     await Product.findByIdAndDelete(id);
-    res.status(200).json({ success: true, message: "Product deleted successfully." });
+    res
+      .status(200)
+      .json({ success: true, message: "Product deleted successfully." });
   } catch (error) {
     console.error("Error deleting product:", error);
-    res.status(500).json({ message: "Error deleting product", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error deleting product", error: error.message });
   }
 };
 
+// ✅ Get all products
 exports.getAllProducts = async (req, res) => {
   try {
     const products = await Product.find().sort({ createdAt: -1 });
     res.status(200).json(products);
   } catch (error) {
     console.error("Error fetching products:", error);
-    res.status(500).json({ message: "Error fetching products", error: error.message });
+    res
+      .status(500)
+      .json({ message: "Error fetching products", error: error.message });
+  }
+};
+
+// ✅ Get products listed by a specific user
+exports.mylistedProducts = async (req, res) => {
+  try {
+    // Expect the owner's user ID to be sent as a query or body
+    // You can adjust this depending on your auth system
+    const { owner } = req.query; // e.g. /mylisting?owner=<userId>
+
+    if (!owner) {
+      return res
+        .status(400)
+        .json({ message: "Owner ID is required to fetch listings." });
+    }
+
+    const products = await Product.find({ owner }).sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      products,
+    });
+  } catch (error) {
+    console.error("Error fetching user listings:", error);
+    res
+      .status(500)
+      .json({ message: "Error fetching user listings", error: error.message });
   }
 };
