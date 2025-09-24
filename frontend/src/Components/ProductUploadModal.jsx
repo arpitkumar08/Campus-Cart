@@ -1,10 +1,14 @@
 import React, { useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import useProductStore from "../store/productStore";
 import useAuthStore from "../store/authStore";
-import toast from "react-hot-toast"; // ✅ toast functions
+import toast from "react-hot-toast";
+import { Loader } from "lucide-react";
 
 const ProductUploadModal = ({ onClose }) => {
+  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
   const { user } = useAuthStore();
   const { addProduct } = useProductStore();
 
@@ -18,6 +22,8 @@ const ProductUploadModal = ({ onClose }) => {
     location: "",
     images: [],
   });
+
+  const [loading, setLoading] = useState(false); // ✅ local loader
 
   const categories = [
     "Electronics",
@@ -60,32 +66,53 @@ const ProductUploadModal = ({ onClose }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // For now, we require at least 0 images since you said images will be done later
-    if (formData.images.length < 0) {
-      toast.error("⚠️ Please select at least 3 images.");
+    if (formData.images.length === 0) {
+      toast.error("Please select at least 1 image.");
       return;
     }
 
     try {
-      const productData = {
+      setLoading(true); // ✅ start loader immediately
+
+      // 1️⃣ Upload images to Cloudinary
+      const uploadedImageUrls = [];
+      for (const image of formData.images) {
+        const cloudData = new FormData();
+        cloudData.append("file", image);
+        cloudData.append("upload_preset", uploadPreset);
+
+        const res = await fetch(
+          `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+          { method: "POST", body: cloudData }
+        );
+
+        const file = await res.json();
+        uploadedImageUrls.push(file.secure_url);
+      }
+
+      // 2️⃣ Prepare data for backend
+      const data = {
         title: formData.title,
         description: formData.description,
         category: formData.category,
-        price: Number(formData.price),
+        price: formData.price,
         isNegotiable: formData.isNegotiable,
         condition: formData.condition,
         location: formData.location,
-        owner: user._id, // required by backend
-        // images can be added later
+        owner: user._id,
+        images: uploadedImageUrls,
       };
 
-      await addProduct(productData);
+      // 3️⃣ Send to backend / MongoDB
+      await addProduct(data);
 
-      toast.success("✅ Product uploaded successfully!");
+      toast.success("Product uploaded successfully!");
       onClose();
     } catch (error) {
-      console.error("❌ Error uploading product:", error);
+      console.error("Error uploading product:", error);
       toast.error(error.response?.data?.message || "Failed to upload product");
+    } finally {
+      setLoading(false); // ✅ stop loader after everything
     }
   };
 
@@ -111,7 +138,6 @@ const ProductUploadModal = ({ onClose }) => {
             </h1>
 
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Title */}
               <input
                 type="text"
                 name="title"
@@ -122,7 +148,6 @@ const ProductUploadModal = ({ onClose }) => {
                 className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-white text-sm outline-none focus:border-purple-500"
               />
 
-              {/* Description */}
               <textarea
                 name="description"
                 placeholder="Product Description"
@@ -133,7 +158,6 @@ const ProductUploadModal = ({ onClose }) => {
                 className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-white text-sm outline-none focus:border-purple-500 resize-none"
               />
 
-              {/* Category */}
               <select
                 name="category"
                 value={formData.category}
@@ -151,7 +175,6 @@ const ProductUploadModal = ({ onClose }) => {
                 ))}
               </select>
 
-              {/* Price */}
               <input
                 type="number"
                 name="price"
@@ -162,7 +185,6 @@ const ProductUploadModal = ({ onClose }) => {
                 className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-white text-sm outline-none focus:border-purple-500"
               />
 
-              {/* Condition */}
               <select
                 name="condition"
                 value={formData.condition}
@@ -176,7 +198,6 @@ const ProductUploadModal = ({ onClose }) => {
                 <option value="Used">Used</option>
               </select>
 
-              {/* Location */}
               <input
                 type="text"
                 name="location"
@@ -187,7 +208,6 @@ const ProductUploadModal = ({ onClose }) => {
                 className="w-full px-4 py-3 rounded-lg bg-gray-800 border border-gray-600 text-white text-sm outline-none focus:border-purple-500"
               />
 
-              {/* Negotiable Checkbox */}
               <label className="flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"
@@ -199,7 +219,51 @@ const ProductUploadModal = ({ onClose }) => {
                 Price Negotiable
               </label>
 
-              {/* Action Buttons */}
+              {/* Image Upload */}
+              <div className="space-y-2">
+                <label className="block text-sm font-medium text-gray-300">
+                  Upload Images (max 3)
+                </label>
+
+                {formData.images.length < 3 && (
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={(e) =>
+                      handleMultipleImageChange(e.target.files)
+                    }
+                    className="block w-full text-sm text-gray-400
+                      file:mr-3 file:py-2 file:px-4
+                      file:rounded-lg file:border-0
+                      file:text-sm file:font-semibold
+                      file:bg-purple-600 file:text-white
+                      hover:file:bg-purple-500 cursor-pointer
+                      border border-gray-600 rounded-lg p-2"
+                  />
+                )}
+
+                {formData.images.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {formData.images.map((file, index) => (
+                      <div
+                        key={index}
+                        className="bg-gray-800 px-3 py-1 rounded-lg text-xs flex items-center gap-2"
+                      >
+                        <span className="truncate max-w-[100px]">{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="text-red-400 hover:text-red-300 font-bold"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               <div className="flex justify-end gap-3 mt-6 pt-4 border-t border-gray-700">
                 <button
                   type="button"
@@ -210,9 +274,11 @@ const ProductUploadModal = ({ onClose }) => {
                 </button>
                 <button
                   type="submit"
-                  className="px-6 py-2 rounded-lg bg-purple-700 hover:bg-purple-600 text-sm font-medium transition-colors"
+                  disabled={loading}
+                  className={`px-6 py-2 rounded-lg text-sm font-medium transition-colors 
+                    ${loading ? 'bg-purple-400 cursor-not-allowed' : 'bg-purple-700 hover:bg-purple-600'}`}
                 >
-                  Upload Product
+                  {loading ? <Loader className="animate-spin mx-auto" size={20} /> : "Upload"}
                 </button>
               </div>
             </form>
