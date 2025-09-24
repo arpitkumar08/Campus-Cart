@@ -20,7 +20,7 @@ const Signup = () => {
 
   const navigate = useNavigate()
 
-  const { signup, isLoading } = useAuthStore()
+  const {   signup, isLoading } = useAuthStore()
 
   const handleSubmit = async (e) => {
     e.preventDefault()

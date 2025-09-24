@@ -6,40 +6,34 @@ exports.addProduct = async (req, res) => {
         category,
         price,
         isNegotiable,
-        images,
+        images = [],      // default empty array
         condition,
-        status,
+        status = "Available", // default status
         location,
         owner
     } = req.body;
 
     try {
-        // ✅ Validate required fields
+        // Validate required fields
         if (
             !title ||
             !category ||
-            price === undefined ||            // check for number
-            isNegotiable === undefined ||     // check for boolean
-            !images ||
+            price === undefined ||
+            isNegotiable === undefined ||
             !condition ||
-            !status ||
             !location ||
             !owner
         ) {
-            return res.status(400).json({ message: "All fields are required." });
+            return res.status(400).json({ message: "All required fields must be provided." });
         }
 
-        // ✅ Check if a product with same title by the same owner exists
-        const productAlreadyExists = await Product.findOne({
-            title,
-            owner
-        });
-
+        // Check if product already exists for this user
+        const productAlreadyExists = await Product.findOne({ title, owner });
         if (productAlreadyExists) {
             return res.status(400).json({ message: "Product already listed." });
         }
 
-        // ✅ Create new product
+        // Create new product
         const product = await Product.create({
             title,
             category,
@@ -52,46 +46,28 @@ exports.addProduct = async (req, res) => {
             owner
         });
 
-        // ✅ Send response
         res.status(201).json({
             success: true,
             message: "Product listed successfully.",
             product
         });
-
     } catch (error) {
         console.error("Error in uploading product.", error);
-        res.status(500).json({
-            message: "Error in uploading product",
-            error: error.message
-        });
+        res.status(500).json({ message: "Error in uploading product", error: error.message });
     }
 };
 
-
-// DELETE a product by ID
 exports.deleteProduct = async (req, res) => {
     const { id } = req.params;
 
     try {
-        // ✅ Check if product exists
         const product = await Product.findById(id);
-        if (!product) {
-            return res.status(404).json({ message: "Product not found." });
-        }
+        if (!product) return res.status(404).json({ message: "Product not found." });
 
-        // ✅ Delete product
         await Product.findByIdAndDelete(id);
-
-        res.status(200).json({
-            success: true,
-            message: "Product deleted successfully."
-        });
+        res.status(200).json({ success: true, message: "Product deleted successfully." });
     } catch (error) {
         console.error("Error deleting product:", error);
-        res.status(500).json({
-            message: "Error deleting product",
-            error: error.message
-        });
+        res.status(500).json({ message: "Error deleting product", error: error.message });
     }
 };
