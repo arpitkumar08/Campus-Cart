@@ -21,6 +21,8 @@ export const useProductStore = create((set) => ({
     set({ isLoading: true, error: null });
     try {
       const response = await axios.get(API_URL);
+      console.log("🟢 Products fetched from backend:", response.data); // <-- Add this line
+
       set({ products: response.data, isLoading: false });
     } catch (error) {
       set({
@@ -30,6 +32,7 @@ export const useProductStore = create((set) => ({
       toast.error(error.response?.data?.message || "Error fetching products");
     }
   },
+
 
   // Add a product (supports images via FormData)
   // Add a product (now sends JSON with Cloudinary URLs)

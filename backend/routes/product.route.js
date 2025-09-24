@@ -9,4 +9,6 @@ router.post("/addproduct", productController.addProduct);
 // ✅ Delete product
 router.delete("/deleteproduct/:id", productController.deleteProduct);
 
+router.get('/', productController.getAllProducts)
+
 module.exports = router;

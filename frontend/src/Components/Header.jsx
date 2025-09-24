@@ -87,7 +87,7 @@ const Header = () => {
                         </p>
                         <p className="text-xs text-gray-300">{user?.email}</p>
                       </div>
-                      <div className="py-1 !bg-gray-800">
+                      <div className="py-1 !bg-gray-800 cursor-pointer">
                         <DropdownMenuItem className="!text-gray-200 !hover:bg-gray-700 !bg-transparent px-3 py-2 cursor-pointer">
                           Profile
                         </DropdownMenuItem>
@@ -109,7 +109,7 @@ const Header = () => {
                         <DropdownMenuItem className="!text-gray-200 !hover:bg-gray-700 !bg-transparent px-3 py-2 cursor-pointer">
                           <button
                             onClick={handleLogout}
-                            className="w-full text-red-400 text-left hover:text-red-300"
+                            className="w-full text-red-400 text-left hover:text-red-300 cursor-pointer"
                           >
                             Log out
                           </button>
