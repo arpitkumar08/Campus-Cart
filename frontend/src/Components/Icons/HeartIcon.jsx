@@ -9,7 +9,6 @@ const HeartIcon = ({ product, size = 20, className = "", showAnimation = true })
   const handleClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    console.log("Heart icon clicked for product:", product._id);
     toggleFavorite(product._id);
   };
 

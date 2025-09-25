@@ -32,11 +32,9 @@ export const useProductStore = create((set, get) => ({
   fetchMyListedProducts: async () => {
     set({ isLoading: true, error: null });
     try {
-      console.log("📥 Fetching My Listed Products...");
       const res = await axios.get(`${API_URL}/products/mylisting`, {
         withCredentials: true,
       });
-      console.log("✅ My Listed Products Response:", res.data);
       set({ myProducts: res.data.products || [], isLoading: false });
     } catch (err) {
       console.error("❌ Error fetching my listed products:", err);
@@ -53,7 +51,6 @@ export const useProductStore = create((set, get) => ({
       const res = await axios.get(`${API_URL}/favorite`, {
         withCredentials: true,
       });
-      console.log("✅ Favorites fetched:", res.data);
       set({ favorites: res.data.favorites, isLoading: false });
     } catch (err) {
       console.error("❌ Error fetching favorites:", err);
@@ -64,14 +61,12 @@ export const useProductStore = create((set, get) => ({
 
   // ✅ Toggle favorite
   toggleFavorite: async (productId) => {
-    console.log("🔄 Toggling favorite for product ID:", productId);
     try {
       const res = await axios.post(
         `${API_URL}/favorite/${productId}`,
         {},
         { withCredentials: true }
       );
-      console.log("✅ Favorites updated:", res.data);
       set({ favorites: res.data.favorites });
       toast.success("Favorites updated!");
     } catch (err) {
@@ -85,10 +80,6 @@ export const useProductStore = create((set, get) => ({
     const { favorites } = get();
     const result = favorites.some(
       (fav) => fav._id === productId || fav === productId
-    );
-    console.log(
-      `🔍 Checking if product ${productId} is favorite:`,
-      result
     );
     return result;
   },

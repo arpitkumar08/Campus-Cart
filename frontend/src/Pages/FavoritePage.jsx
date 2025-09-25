@@ -23,7 +23,6 @@ const FavoritesPage = () => {
 
   // Fetch favorites on mount
   useEffect(() => {
-    console.log("FavoritesPage mounted: fetching favorites...");
     fetchFavorites();
   }, []);
 
@@ -35,7 +34,6 @@ const FavoritesPage = () => {
     );
   }
 
-  console.log("Rendering FavoritesPage with items:", favorites);
 
   return (
     <div className="relative min-h-screen p-6 bg-gradient-to-b from-gray-900 via-gray-950 to-black">

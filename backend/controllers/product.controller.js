@@ -106,7 +106,6 @@ exports.mylistedProducts = async (req, res) => {
     // Use the logged-in user's ID provided by protect middleware
     const ownerId = req.user._id;
 
-    console.log("Fetching my listings for:", ownerId);
 
     const products = await Product.find({ owner: ownerId }).sort({ createdAt: -1 });
 
