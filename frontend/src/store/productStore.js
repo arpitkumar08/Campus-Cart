@@ -9,12 +9,12 @@ const API_URL =
 
 export const useProductStore = create((set, get) => ({
   products: [],
-  myProducts: [],   // ✅ User's own listed products
+  myProducts: [],
   favorites: [],
   isLoading: false,
   error: null,
 
-  // ✅ Fetch ALL products
+  // Fetch all products
   fetchProducts: async () => {
     set({ isLoading: true, error: null });
     try {
@@ -27,8 +27,7 @@ export const useProductStore = create((set, get) => ({
     }
   },
 
-  // ✅ Fetch MY listed products
-  // inside useProductStore
+  // Fetch MY listed products
   fetchMyListedProducts: async () => {
     set({ isLoading: true, error: null });
     try {
@@ -43,14 +42,56 @@ export const useProductStore = create((set, get) => ({
     }
   },
 
+  // Add new product
+  // Add new product
+  addProduct: async (productData) => {
+    set({ isLoading: true });
+    try {
+      const res = await axios.post(`${API_URL}/products/addproduct`, productData, {
+        withCredentials: true,
+      });
+      set((state) => ({
+        myProducts: [res.data, ...state.myProducts],
+      }));
+      toast.success("Product uploaded successfully!");
+      return res.data;
+    } catch (err) {
+      console.error("❌ Error adding product:", err);
+      toast.error(err.response?.data?.message || "Failed to add product");
+      throw err;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
 
-  // ✅ Fetch FAVORITES
+
+  // Update existing product
+  updateProduct: async (productId, updatedData) => {
+    set({ isLoading: true });
+    try {
+      const res = await axios.put(`${API_URL}/products/update/${productId}`, updatedData, {
+        withCredentials: true,
+      });
+      set((state) => ({
+        myProducts: state.myProducts.map((p) =>
+          p._id === productId ? res.data : p
+        ),
+      }));
+      toast.success("Product updated successfully!");
+      return res.data;
+    } catch (err) {
+      console.error("❌ Error updating product:", err);
+      toast.error(err.response?.data?.message || "Failed to update product");
+      throw err;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+  // Fetch favorites
   fetchFavorites: async () => {
     set({ isLoading: true });
     try {
-      const res = await axios.get(`${API_URL}/favorite`, {
-        withCredentials: true,
-      });
+      const res = await axios.get(`${API_URL}/favorite`, { withCredentials: true });
       set({ favorites: res.data.favorites, isLoading: false });
     } catch (err) {
       console.error("❌ Error fetching favorites:", err);
@@ -59,14 +100,10 @@ export const useProductStore = create((set, get) => ({
     }
   },
 
-  // ✅ Toggle favorite
+  // Toggle favorite
   toggleFavorite: async (productId) => {
     try {
-      const res = await axios.post(
-        `${API_URL}/favorite/${productId}`,
-        {},
-        { withCredentials: true }
-      );
+      const res = await axios.post(`${API_URL}/favorite/${productId}`, {}, { withCredentials: true });
       set({ favorites: res.data.favorites });
       toast.success("Favorites updated!");
     } catch (err) {
@@ -75,13 +112,10 @@ export const useProductStore = create((set, get) => ({
     }
   },
 
-  // ✅ Check if product is a favorite
+  // Check if favorite
   isFavorite: (productId) => {
     const { favorites } = get();
-    const result = favorites.some(
-      (fav) => fav._id === productId || fav === productId
-    );
-    return result;
+    return favorites.some((fav) => fav._id === productId || fav === productId);
   },
 }));
 

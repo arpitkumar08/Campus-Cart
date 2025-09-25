@@ -121,3 +121,17 @@ exports.mylistedProducts = async (req, res) => {
       .json({ message: "Error fetching user listings", error: error.message });
   }
 };
+
+exports.updateProduct = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const updates = req.body;
+
+    const product = await Product.findByIdAndUpdate(id, updates, { new: true });
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    res.status(200).json(product);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};

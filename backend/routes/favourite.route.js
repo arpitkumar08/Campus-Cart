@@ -9,7 +9,6 @@ router.get('/', protect, async (req, res) => {
   console.log("GET /favorite called by user:", req.user._id);
   try {
     const user = await User.findById(req.user._id).populate('favorites');
-    console.log("User favorites fetched:", user.favorites);
     res.json({ favorites: user.favorites });
   } catch (err) {
     console.error("Error fetching favorites:", err);
@@ -27,7 +26,6 @@ router.post('/:productId', protect, async (req, res) => {
 
     if (user.favorites.includes(productId)) {
       user.favorites = user.favorites.filter(fav => fav.toString() !== productId);
-      console.log("Removed product from favorites:", productId);
     } else {
       user.favorites.push(productId);
       console.log("Added product to favorites:", productId);

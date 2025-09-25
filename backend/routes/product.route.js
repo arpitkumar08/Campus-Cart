@@ -17,4 +17,6 @@ router.get("/", productController.getAllProducts);
 // Example: GET /api/products/mylisting?owner=USER_ID
 router.get("/mylisting", protect, productController.mylistedProducts);
 
+router.put("/update/:id", protect, productController.updateProduct);
+
 module.exports = router;
