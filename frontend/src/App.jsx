@@ -10,6 +10,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import useAuthStore from "./store/authStore";
 import { useEffect } from "react";
 import MyListings from "./Components/MyListing";
+import FavoritesPage from "./Pages/FavoritePage";
 
 const App = () => {
 
@@ -34,6 +35,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <MyListings />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/favourite"
+          element={
+            <ProtectedRoute>
+              <FavoritesPage />
             </ProtectedRoute>
           }
         />

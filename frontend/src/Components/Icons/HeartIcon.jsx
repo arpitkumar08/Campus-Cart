@@ -2,19 +2,15 @@ import React from 'react';
 import { Heart } from 'lucide-react';
 import useProductStore from '../../store/productStore';
 
-const HeartIcon = ({ 
-  product, 
-  size = 20, 
-  className = "",
-  showAnimation = true 
-}) => {
+const HeartIcon = ({ product, size = 20, className = "", showAnimation = true }) => {
   const { toggleFavorite, isFavorite } = useProductStore();
   const isLiked = isFavorite(product._id);
 
   const handleClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    toggleFavorite(product);
+    console.log("Heart icon clicked for product:", product._id);
+    toggleFavorite(product._id);
   };
 
   return (
@@ -27,7 +23,6 @@ const HeartIcon = ({
       `}
       title={isLiked ? "Remove from favorites" : "Add to favorites"}
     >
-      {/* Background circle for contrast */}
       <div className="absolute inset-0 rounded-full bg-black/40 z-0"></div>
 
       <Heart
@@ -41,7 +36,6 @@ const HeartIcon = ({
         `}
       />
 
-      {/* Optional ping animation */}
       {showAnimation && isLiked && (
         <div className="absolute inset-0 rounded-full bg-red-500/20 animate-ping z-0"></div>
       )}

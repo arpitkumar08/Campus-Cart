@@ -1,32 +1,41 @@
-import React from "react";
+import React, { useEffect } from "react";
 import TiltedCard from "../Components/Home/TitleCard";
 import useProductStore from "../store/productStore";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
 const FavoritesPage = () => {
-  const { favorites } = useProductStore();
+  const { favorites, fetchFavorites, isLoading } = useProductStore();
   const navigate = useNavigate();
 
   // Map categories to emojis
   function getCategoryEmoji(category) {
     switch (category?.toLowerCase()) {
-      case "electronics":
-        return "💻";
-      case "books":
-        return "📚";
-      case "clothes":
-        return "👕";
-      case "sports":
-        return "🏀";
-      case "furniture":
-        return "🛋️";
-      case "transportation":
-        return "🏍️";
-      default:
-        return "🛍️";
+      case "electronics": return "💻";
+      case "books": return "📚";
+      case "clothes": return "👕";
+      case "sports": return "🏀";
+      case "furniture": return "🛋️";
+      case "transportation": return "🏍️";
+      default: return "🛍️";
     }
   }
+
+  // Fetch favorites on mount
+  useEffect(() => {
+    console.log("FavoritesPage mounted: fetching favorites...");
+    fetchFavorites();
+  }, []);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex justify-center items-center bg-gray-900 text-white text-lg">
+        Loading favorites...
+      </div>
+    );
+  }
+
+  console.log("Rendering FavoritesPage with items:", favorites);
 
   return (
     <div className="relative min-h-screen p-6 bg-gradient-to-b from-gray-900 via-gray-950 to-black">
@@ -39,7 +48,7 @@ const FavoritesPage = () => {
         <span className="hidden sm:inline text-sm font-medium">Home</span>
       </button>
 
-      <h1 className="text-2xl font-bold mb-4 text-white mt-6">My Favorites ❤️</h1>
+      <h1 className="text-2xl font-bold mb-4 text-white mt-6">My Favorites</h1>
 
       {/* Favorites Grid */}
       <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4 justify-items-center">

@@ -1,5 +1,5 @@
-const mongoose = require('mongoose')
-const bcrypt = require('bcrypt')
+const mongoose = require('mongoose');
+const bcrypt = require('bcrypt');
 
 const userSchema = new mongoose.Schema({
     fullName: { type: String, required: true },
@@ -11,7 +11,8 @@ const userSchema = new mongoose.Schema({
     resetPasswordTokenExpiresAt: Date,
     verificationToken: String,
     verificationTokenExpiresAt: Date,
-}, { timestamps: true })
+    favorites: [{ type: mongoose.Schema.Types.ObjectId, ref: "Product" }],
+}, { timestamps: true });
 
 userSchema.pre("save", async function (next) {
     if (!this.isModified("password")) return next();
@@ -20,6 +21,6 @@ userSchema.pre("save", async function (next) {
     next();
 });
 
-const User = mongoose.model('User', userSchema)
-
-module.exports = User; // ✅ export the model
+// ✅ Check if model exists before creating
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+module.exports = User;

@@ -2,107 +2,68 @@ import { create } from "zustand";
 import axios from "axios";
 import toast from "react-hot-toast";
 
-const API_URL =
-  import.meta.env.MODE === "development"
-    ? "http://localhost:5000/api/products"
-    : "/api/products";
+const API_URL = import.meta.env.MODE === "development"
+  ? "http://localhost:5000/api"
+  : "/api";
 
-const ADD_PRODUCT_URL = `${API_URL}/addproduct`;
-const DELETE_PRODUCT_URL = (id) => `${API_URL}/deleteproduct/${id}`;
-const MY_LISTED_PRODUCTS_URL = `${API_URL}/mylisting`; // ✅ new endpoint
-
-export const useProductStore = create((set) => ({
-  products: [],        // All products
-  myProducts: [],      // ✅ Only products added by logged-in user
-  product: null,
+export const useProductStore = create((set, get) => ({
+  products: [],
+  myProducts: [],
+  favorites: [],
   isLoading: false,
   error: null,
 
-  // ✅ Fetch all products
+  // Fetch all products
   fetchProducts: async () => {
+    console.log("Fetching all products...");
     set({ isLoading: true, error: null });
     try {
-      const response = await axios.get(API_URL);
-      console.log("🟢 Products fetched from backend:", response.data);
-      set({ products: response.data, isLoading: false });
-    } catch (error) {
-      set({
-        error: error.response?.data?.message || "Error fetching products",
-        isLoading: false,
-      });
-      toast.error(error.response?.data?.message || "Error fetching products");
+      const res = await axios.get(`${API_URL}/products`);
+      console.log("Products fetched:", res.data);
+      set({ products: res.data, isLoading: false });
+    } catch (err) {
+      console.error("Error fetching products:", err);
+      set({ error: err.message, isLoading: false });
+      toast.error("Error fetching products");
     }
   },
 
-  fetchMyListedProducts: async (ownerId) => {
-    set({ isLoading: true, error: null });
+  // Fetch favorite products
+  fetchFavorites: async () => {
+    console.log("Fetching favorite products...");
+    set({ isLoading: true });
     try {
-      const response = await axios.get(MY_LISTED_PRODUCTS_URL, {
-        params: { owner: ownerId },
-      });
-
-      // Extract the array
-      set({ myProducts: response.data.products, isLoading: false });
-    } catch (error) {
-      set({
-        error:
-          error.response?.data?.message ||
-          "Error fetching your listed products",
-        isLoading: false,
-      });
+      const res = await axios.get(`${API_URL}/favorite`, { withCredentials: true });
+      console.log("Favorites fetched:", res.data.favorites);
+      set({ favorites: res.data.favorites, isLoading: false });
+    } catch (err) {
+      console.error("Error fetching favorites:", err);
+      set({ isLoading: false });
+      toast.error("Error fetching favorites");
     }
   },
 
-
-  // ✅ Add a product
-  addProduct: async (productData) => {
-    set({ isLoading: true, error: null });
+  // Toggle favorite
+  toggleFavorite: async (productId) => {
+    console.log("Toggling favorite for product ID:", productId);
     try {
-      const response = await axios.post(ADD_PRODUCT_URL, productData, {
-        headers: { "Content-Type": "application/json" },
-      });
-
-      set((state) => ({
-        products: [response.data.product, ...state.products],
-        myProducts: [response.data.product, ...state.myProducts], // add to personal list too
-        isLoading: false,
-      }));
-
-      toast.success("✅ Product uploaded successfully!");
-      return response.data.product;
-    } catch (error) {
-      set({
-        error: error.response?.data?.message || "Error adding product",
-        isLoading: false,
-      });
-      toast.error(error.response?.data?.message || "Error adding product");
-      throw error;
+      const res = await axios.post(`${API_URL}/favorite/${productId}`, {}, { withCredentials: true });
+      console.log("Updated favorites from backend:", res.data.favorites);
+      set({ favorites: res.data.favorites });
+      toast.success("Updated favorites!");
+    } catch (err) {
+      console.error("Error toggling favorite:", err);
+      toast.error(err.response?.data?.message || "Error updating favorites");
     }
   },
 
-  // ✅ Delete a product
-  deleteProduct: async (id) => {
-    set({ isLoading: true, error: null });
-    try {
-      await axios.delete(DELETE_PRODUCT_URL(id));
-      set((state) => ({
-        products: state.products.filter((p) => p._id !== id),
-        myProducts: state.myProducts.filter((p) => p._id !== id),
-        isLoading: false,
-      }));
-      toast.success("✅ Product deleted successfully!");
-    } catch (error) {
-      set({
-        error: error.response?.data?.message || "Error deleting product",
-        isLoading: false,
-      });
-      toast.error(error.response?.data?.message || "Error deleting product");
-    }
+  // Check if a product is favorite
+  isFavorite: (productId) => {
+    const { favorites } = get();
+    const result = favorites.some(fav => fav._id === productId || fav === productId);
+    console.log(`isFavorite check for ${productId}:`, result);
+    return result;
   },
-
-
-
-  isFavorite: async => {}
 }));
 
 export default useProductStore;

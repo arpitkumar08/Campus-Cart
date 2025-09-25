@@ -3,6 +3,7 @@ const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/auth.route');
 const productRoutes = require('./routes/product.route');
+const favoriteRoutes = require('./routes/favourite.route')
 const connectDB = require('./db/connectDB');
 const cors = require('cors');
 
@@ -23,6 +24,7 @@ app.use(cookieParser());
 // ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes); // ✅ plural
+app.use('/api/favorite', favoriteRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

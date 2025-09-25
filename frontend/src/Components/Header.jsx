@@ -15,14 +15,18 @@ const Header = () => {
   const navigate = useNavigate();
 
   const { logout } = useAuthStore();
-  
+
   const [searchQuery, setSearchQuery] = useState('');
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isUploadOpen, setIsUploadOpen] = useState(false); 
-  
+  const [isUploadOpen, setIsUploadOpen] = useState(false);
+
 
   const getMyListing = async () => {
-        navigate("/mylisting"); // ✅ Go to MyListings page
+    navigate("/mylisting"); // ✅ Go to MyListings page
+
+  }
+  const getMyFavourites = async () => {
+    navigate("/favourite"); 
 
   }
 
@@ -97,11 +101,11 @@ const Header = () => {
                         <p className="text-xs text-gray-300">{user?.email}</p>
                       </div>
                       <div className="py-1 !bg-gray-800 cursor-pointer">
-                       
+
                         <DropdownMenuItem className="!text-gray-200 !hover:bg-gray-700 !bg-transparent px-3 py-2 cursor-pointer">
-                          <button 
-                          onClick={getMyListing}
-                          className='cursor-pointer'
+                          <button
+                            onClick={getMyListing}
+                            className='cursor-pointer'
                           >
                             My Listings
                           </button>
@@ -112,9 +116,12 @@ const Header = () => {
                           </button>
                         </DropdownMenuItem>
                         <DropdownMenuItem className="!text-gray-200 !hover:bg-gray-700 !bg-transparent px-3 py-2 cursor-pointer">
-                          Favorites
+                          <button onClick={getMyFavourites}>
+
+                            Favorites
+                          </button>
                         </DropdownMenuItem>
-                       
+
                         <div className="border-t border-gray-600 my-1"></div>
                         <DropdownMenuItem className="!text-gray-200 !hover:bg-gray-700 !bg-transparent px-3 py-2 cursor-pointer">
                           <button
