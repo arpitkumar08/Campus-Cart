@@ -99,6 +99,10 @@ export const useProductStore = create((set) => ({
       toast.error(error.response?.data?.message || "Error deleting product");
     }
   },
+
+
+
+  isFavorite: async => {}
 }));
 
 export default useProductStore;

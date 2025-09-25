@@ -1,27 +1,21 @@
 import React, { useEffect } from "react";
 import TiltedCard from "../Home/TitleCard";
+import HeartIcon from "../Icons/HeartIcon"; // ✅ import HeartIcon
 import useProductStore from "../../store/productStore";
 
 const Products = () => {
   const { products, fetchProducts, isLoading } = useProductStore();
 
   function getCategoryEmoji(category) {
-  switch (category.toLowerCase()) {
-    case "electronics":
-      return "💻";
-    case "books":
-      return "📚";
-    case "clothes":
-      return "👕";
-    case "sports":
-      return "🏀";
-    case "furniture":
-      return "🛋️";
-    default:
-      return "🛍️";
+    switch (category.toLowerCase()) {
+      case "electronics": return "💻";
+      case "books": return "📚";
+      case "clothes": return "👕";
+      case "sports": return "🏀";
+      case "furniture": return "🛋️";
+      default: return "🛍️";
+    }
   }
-}
-
 
   useEffect(() => {
     fetchProducts();
@@ -55,9 +49,14 @@ const Products = () => {
             displayOverlayContent={true}
             overlayContent={
               <>
-                {/* Top-left category badge with emoji */}
+                {/* Top-left category badge */}
                 <div className="absolute top-2 left-2 bg-blue-500/90 text-white text-xs font-semibold px-2 py-1 rounded-md z-20 flex items-center gap-1">
                   {getCategoryEmoji(product.category)} {product.category}
+                </div>
+
+                {/* Top-right heart icon */}
+                <div className="absolute top-2 right-2 z-20">
+                  <HeartIcon product={product} size={20} />
                 </div>
 
                 {/* Bottom overlay */}
@@ -69,8 +68,6 @@ const Products = () => {
               </>
             }
           />
-
-
         ))
       ) : (
         <p className="text-white text-center col-span-full mt-10">No products found.</p>
