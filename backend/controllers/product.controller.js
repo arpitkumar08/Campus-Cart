@@ -100,20 +100,15 @@ exports.getAllProducts = async (req, res) => {
   }
 };
 
-// ✅ Get products listed by a specific user
+// ✅ Get products listed by the logged-in user
 exports.mylistedProducts = async (req, res) => {
   try {
-    // Expect the owner's user ID to be sent as a query or body
-    // You can adjust this depending on your auth system
-    const { owner } = req.query; // e.g. /mylisting?owner=<userId>
+    // Use the logged-in user's ID provided by protect middleware
+    const ownerId = req.user._id;
 
-    if (!owner) {
-      return res
-        .status(400)
-        .json({ message: "Owner ID is required to fetch listings." });
-    }
+    console.log("Fetching my listings for:", ownerId);
 
-    const products = await Product.find({ owner }).sort({ createdAt: -1 });
+    const products = await Product.find({ owner: ownerId }).sort({ createdAt: -1 });
 
     res.status(200).json({
       success: true,
@@ -121,7 +116,7 @@ exports.mylistedProducts = async (req, res) => {
       products,
     });
   } catch (error) {
-    console.error("Error fetching user listings:", error);
+    console.error("❌ Error fetching user listings:", error);
     res
       .status(500)
       .json({ message: "Error fetching user listings", error: error.message });

@@ -1,5 +1,6 @@
 const express = require("express");
 const productController = require("../controllers/product.controller");
+const { protect } = require('../middlewares/auth.middleware')
 
 const router = express.Router();
 
@@ -14,6 +15,6 @@ router.get("/", productController.getAllProducts);
 
 // ✅ Get products listed by a specific user
 // Example: GET /api/products/mylisting?owner=USER_ID
-router.get("/mylisting", productController.mylistedProducts);
+router.get("/mylisting", protect, productController.mylistedProducts);
 
 module.exports = router;
