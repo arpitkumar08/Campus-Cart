@@ -26,7 +26,6 @@ router.post('/:productId', protect, async (req, res) => {
       user.favorites = user.favorites.filter(fav => fav.toString() !== productId);
     } else {
       user.favorites.push(productId);
-      console.log("Added product to favorites:", productId);
     }
 
     await user.save();

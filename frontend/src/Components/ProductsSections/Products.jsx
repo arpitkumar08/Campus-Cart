@@ -5,7 +5,7 @@ import HeartIcon from "../Icons/HeartIcon";
 import useProductStore from "../../store/productStore";
 
 const Products = () => {
-  const { products, fetchProducts, isLoading } = useProductStore();
+  const { products, fetchProducts, isLoading, fetchFavorites } = useProductStore();
   const navigate = useNavigate(); // ✅ hook for navigation
 
   function getCategoryEmoji(category) {
@@ -21,6 +21,7 @@ const Products = () => {
 
   useEffect(() => {
     fetchProducts();
+    fetchFavorites()
   }, []);
 
   if (isLoading) {

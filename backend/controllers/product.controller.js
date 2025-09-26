@@ -139,18 +139,14 @@ exports.updateProduct = async (req, res) => {
 // ✅ Get product details by ID
 exports.getProductDetails = async (req, res) => {
   const { id } = req.params;
-  console.log("🔵 Backend: Getting product details for ID:", id);
   
   try {
     const product = await Product.findById(id);
-    console.log("🔍 Backend: Found product:", product);
     
     if (!product) {
-      console.log("❌ Backend: Product not found");
       return res.status(404).json({ message: "Product not found" });
     }
     
-    console.log("✅ Backend: Sending product data");
     res.status(200).json(product);
   } catch (error) {
     console.error("❌ Backend Error:", error);
