@@ -6,7 +6,6 @@ const Product = require('../models/product.model');
 
 // ✅ Get user's favorites
 router.get('/', protect, async (req, res) => {
-  console.log("GET /favorite called by user:", req.user._id);
   try {
     const user = await User.findById(req.user._id).populate('favorites');
     res.json({ favorites: user.favorites });
@@ -19,7 +18,6 @@ router.get('/', protect, async (req, res) => {
 // ✅ Toggle favorite
 router.post('/:productId', protect, async (req, res) => {
   const productId = req.params.productId;
-  console.log("POST /favorite toggle for product:", productId, "by user:", req.user._id);
 
   try {
     const user = await User.findById(req.user._id);
@@ -33,7 +31,6 @@ router.post('/:productId', protect, async (req, res) => {
 
     await user.save();
     await user.populate('favorites');
-    console.log("Updated favorites sent to frontend:", user.favorites);
 
     res.json({ favorites: user.favorites });
   } catch (err) {

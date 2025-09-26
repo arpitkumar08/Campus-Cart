@@ -11,6 +11,7 @@ import useAuthStore from "./store/authStore";
 import { useEffect } from "react";
 import MyListings from "./Components/MyListing";
 import FavoritesPage from "./Pages/FavoritePage";
+import ProductDetails from "./Pages/ProductDetails";
 
 const App = () => {
 
@@ -43,6 +44,14 @@ const App = () => {
           element={
             <ProtectedRoute>
               <FavoritesPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/details/:id"
+          element={
+            <ProtectedRoute>
+            <ProductDetails />
             </ProtectedRoute>
           }
         />

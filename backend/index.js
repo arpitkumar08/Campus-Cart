@@ -23,7 +23,7 @@ app.use(cookieParser());
 
 // ✅ Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/products", productRoutes); // ✅ plural
+app.use("/api", productRoutes); // ✅ plural
 app.use('/api/favorite', favoriteRoutes);
 
 const PORT = process.env.PORT || 5000;

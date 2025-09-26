@@ -13,10 +13,13 @@ router.delete("/deleteproduct/:id", productController.deleteProduct);
 // ✅ Get all products
 router.get("/", productController.getAllProducts);
 
-// ✅ Get products listed by a specific user
-// Example: GET /api/products/mylisting?owner=USER_ID
+// ✅ Get products by logged-in user
 router.get("/mylisting", protect, productController.mylistedProducts);
 
+// ✅ Update product
 router.put("/update/:id", protect, productController.updateProduct);
+
+// 🔧 FIXED: Changed route to match frontend call
+router.get('/product/:id', productController.getProductDetails);
 
 module.exports = router;

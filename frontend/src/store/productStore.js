@@ -18,7 +18,8 @@ export const useProductStore = create((set, get) => ({
   fetchProducts: async () => {
     set({ isLoading: true, error: null });
     try {
-      const res = await axios.get(`${API_URL}/products`);
+      const res = await axios.get(`${API_URL}/`);
+      console.log(res)
       set({ products: res.data, isLoading: false });
     } catch (err) {
       console.error("❌ Error fetching products:", err);
@@ -31,7 +32,7 @@ export const useProductStore = create((set, get) => ({
   fetchMyListedProducts: async () => {
     set({ isLoading: true, error: null });
     try {
-      const res = await axios.get(`${API_URL}/products/mylisting`, {
+      const res = await axios.get(`${API_URL}/mylisting`, {
         withCredentials: true,
       });
       set({ myProducts: res.data.products || [], isLoading: false });
