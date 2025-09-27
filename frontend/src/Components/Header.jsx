@@ -22,6 +22,7 @@ const Header = () => {
 
   const getMyListing = () => navigate("/mylisting");
   const getMyFavourites = () => navigate("/favourite");
+  const getChats = () => navigate('/chat')
   const handleLogout = async () => await logout();
   const handleProductUpload = () => setIsUploadOpen(true);
 
@@ -80,6 +81,9 @@ const Header = () => {
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <button onClick={handleProductUpload}>Upload Product</button>
+                        </DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <button onClick={getChats}>My Chats</button>
                         </DropdownMenuItem>
                         <DropdownMenuItem>
                           <button onClick={getMyFavourites}>Favorites</button>

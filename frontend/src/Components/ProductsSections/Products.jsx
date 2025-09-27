@@ -54,7 +54,7 @@ const Products = () => {
       filtered = filtered.filter(product => selectedLocations.includes(product.location));
     }
 
-    // Price filter (only if changed from default)
+    // Price filter
     if (priceRange[0] !== 0 || priceRange[1] !== 10000) {
       filtered = filtered.filter(product => {
         const price = parseFloat(product.price) || 0;
@@ -121,17 +121,17 @@ const Products = () => {
       <div className="p-6">
         <div className="max-w-7xl mx-auto">
           {filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 justify-items-center">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 justify-items-center">
               {filteredProducts.map((product) => (
                 <TiltedCard
                   key={product._id}
                   imageSrc={product.images?.[0] || "/images/default.png"}
                   altText={product.title}
                   captionText={product.title}
-                  containerHeight="300px"
-                  containerWidth="220px"
-                  imageHeight="290px"
-                  imageWidth="220px"
+                  containerHeight="280px"
+                  containerWidth="200px"
+                  imageHeight="260px"
+                  imageWidth="200px"
                   rotateAmplitude={10}
                   scaleOnHover={1.05}
                   displayOverlayContent={true}

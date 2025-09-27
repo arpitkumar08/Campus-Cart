@@ -12,6 +12,7 @@ import { useEffect } from "react";
 import MyListings from "./Components/MyListing";
 import FavoritesPage from "./Pages/FavoritePage";
 import ProductDetails from "./Pages/ProductDetails";
+import ChatPage from "./Pages/Chats/ChatPage";
 
 const App = () => {
 
@@ -52,6 +53,14 @@ const App = () => {
           element={
             <ProtectedRoute>
             <ProductDetails />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/chat"
+          element={
+            <ProtectedRoute>
+            <ChatPage />
             </ProtectedRoute>
           }
         />

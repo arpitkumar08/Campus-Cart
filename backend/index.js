@@ -6,6 +6,8 @@ const productRoutes = require('./routes/product.route');
 const favoriteRoutes = require('./routes/favourite.route')
 const connectDB = require('./db/connectDB');
 const cors = require('cors');
+const chatRoute = require('./routes/chat.route')
+
 
 dotenv.config();
 connectDB();
@@ -25,6 +27,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api", productRoutes); // ✅ plural
 app.use('/api/favorite', favoriteRoutes);
+app.use('/api/chats', chatRoute)
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

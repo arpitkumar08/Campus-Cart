@@ -1,11 +1,17 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from "axios";
 
 const ProductDetails = () => {
     const { id } = useParams();
     const [product, setProduct] = useState(null);
     const [mainImage, setMainImage] = useState("");
+
+    const navigate = useNavigate()
+
+    const handleChatPart = () => {
+        navigate('/chat')
+    }
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -110,7 +116,7 @@ const ProductDetails = () => {
                 )}
                 <button
                     className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition w-fit"
-                    onClick={() => alert("Chat with Seller UI only")}
+                    onClick={handleChatPart}
                 >
                     💬 Chat with Seller
                 </button>
