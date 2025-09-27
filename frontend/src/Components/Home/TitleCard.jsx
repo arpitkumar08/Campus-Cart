@@ -17,6 +17,7 @@ export default function TiltedCard({
   showTooltip = true,
   overlayContent = null,
   displayOverlayContent = false,
+  onClick = () => {}, // ✅ New onClick prop
 }) {
   const ref = useRef(null);
   const x = useMotionValue(0);
@@ -41,7 +42,11 @@ export default function TiltedCard({
     setLastY(offsetY);
   }
 
-  function handleMouseEnter() { scale.set(scaleOnHover); opacity.set(1); }
+  function handleMouseEnter() {
+    scale.set(scaleOnHover);
+    opacity.set(1);
+  }
+
   function handleMouseLeave() {
     rotateX.set(0);
     rotateY.set(0);
@@ -53,17 +58,21 @@ export default function TiltedCard({
   return (
     <figure
       ref={ref}
+      onClick={onClick} // ✅ Entire card is clickable
       className="relative w-full h-full [perspective:800px] flex flex-col items-center cursor-pointer justify-center"
       style={{ height: containerHeight, width: containerWidth }}
       onMouseMove={handleMouse}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
+      {/* ⚠️ Optional mobile warning */}
       {showMobileWarning && (
         <div className="absolute top-4 text-center text-sm block sm:hidden text-gray-300">
           This effect is not optimized for mobile.
         </div>
       )}
+
+      {/* 3D Tilted Image */}
       <motion.div
         className="relative [transform-style:preserve-3d] rounded-xl shadow-lg overflow-hidden"
         style={{ width: imageWidth, height: imageHeight, rotateX, rotateY, scale }}
@@ -73,6 +82,8 @@ export default function TiltedCard({
           alt={altText}
           className="absolute top-0 left-0 object-cover w-full h-full"
         />
+
+        {/* ✅ Overlay Content (category, price, etc.) */}
         {displayOverlayContent && overlayContent && (
           <motion.div
             className="absolute top-0 left-0 z-10 w-full h-full"

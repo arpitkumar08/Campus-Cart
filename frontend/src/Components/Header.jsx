@@ -5,18 +5,18 @@ import Avatar from './ui-header/Avatar';
 import DropdownMenu from './ui-header/DropdownMenu';
 import DropdownMenuItem from './ui-header/DropdownMenuItem';
 import { useAuthStore } from '../store/authStore';
-import Filter from './Filter/Filter';
+import Filter from './Filter/Filter'; // No need to pass props anymore
 import { useNavigate } from "react-router-dom";
 import ProductUploadModal from './ProductUploadModal';
 import SearchBar from './ui-header/SearchBar';
-import useSearchStore from '../store/searchStore'; // ✅ Import global search store
+import useSearchStore from '../store/searchStore';
 
 const Header = () => {
   const user = useAuthStore((state) => state.user);
   const navigate = useNavigate();
   const { logout } = useAuthStore();
 
-  const { query, setQuery } = useSearchStore(); // ✅ Global search state
+  const { query, setQuery } = useSearchStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = React.useState(false);
   const [isUploadOpen, setIsUploadOpen] = React.useState(false);
 
@@ -38,14 +38,16 @@ const Header = () => {
               </span>
             </div>
 
-            {/* ✅ Desktop Search */}
+            {/* Desktop Search */}
             <div className="hidden md:flex flex-1 max-w-lg mx-6">
               <SearchBar searchQuery={query} setSearchQuery={setQuery} />
             </div>
 
             {/* Right Side Actions */}
             <div className="flex items-center space-x-3">
+              {/* Filter component - no props needed, uses global state */}
               <Filter />
+              
               <Button variant="ghost" size="icon" className="relative group">
                 <Bell className="h-5 w-5 text-white/80 group-hover:text-purple-400 transition-colors" />
                 <span className="absolute -top-1 -right-1 h-4 w-4 bg-purple-500 rounded-full text-xs text-white flex items-center justify-center">
@@ -110,7 +112,7 @@ const Header = () => {
             </div>
           </div>
 
-          {/* ✅ Mobile Search */}
+          {/* Mobile Search */}
           {isMobileMenuOpen && (
             <div className="md:hidden py-4 border-t border-gray-700/30">
               <SearchBar

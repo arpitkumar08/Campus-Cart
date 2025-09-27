@@ -13,7 +13,7 @@ const Home = () => {
         }}
       />
       {/* Main Content */}
-      <div className="relative z-10 flex flex-col gap-10">
+      <div className="relative z-10 flex flex-col gap-1">
         <Header />
         <Products />
       </div>

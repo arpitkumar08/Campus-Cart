@@ -10,7 +10,6 @@ const ProductDetails = () => {
     useEffect(() => {
         const fetchProduct = async () => {
             try {
-                console.log("🔵 Fetching product with id:", id);
 
                 // Use full URL or proxy
                 const res = await axios.get(`http://localhost:5000/api/product/${id}`, {
@@ -19,12 +18,10 @@ const ProductDetails = () => {
                     },
                 });
 
-                console.log("✅ API Response:", res.data);
 
                 setProduct(res.data);
 
                 if (res.data.images && res.data.images.length > 0) {
-                    console.log("🖼️ Images array:", res.data.images);
                     setMainImage(res.data.images[0]);
                 } else {
                     console.warn("⚠️ No images found for this product!");
@@ -38,7 +35,7 @@ const ProductDetails = () => {
     }, [id]);
 
     useEffect(() => {
-        if (mainImage) console.log("✨ Main Image Updated:", mainImage);
+        if (mainImage) ("✨console.log Main Image Updated:", mainImage);
     }, [mainImage]);
 
     if (!product)
@@ -49,7 +46,7 @@ const ProductDetails = () => {
         );
 
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-950 to-black text-white p-6 flex flex-col md:flex-row gap-10">
+        <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-950 to-black text-white p-6 flex flex-col md:flex-row gap-2">
             {/* LEFT: Images */}
             <div className="flex-1 flex flex-col items-center">
                 <div className="w-full max-w-lg border border-gray-700 rounded-lg overflow-hidden">
@@ -72,7 +69,6 @@ const ProductDetails = () => {
                                 className={`w-20 h-20 object-cover rounded-lg border cursor-pointer transition ${mainImage === img ? "border-blue-500" : "border-gray-700"
                                     }`}
                                 onClick={() => {
-                                    console.log("👉 Thumbnail clicked:", img);
                                     setMainImage(img);
                                 }}
                                 onError={() =>
