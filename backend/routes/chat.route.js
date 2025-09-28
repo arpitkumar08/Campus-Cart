@@ -1,4 +1,3 @@
-// chat.route.js
 const express = require('express');
 const {
   createConversation,
@@ -9,6 +8,7 @@ const {
 
 const router = express.Router();
 
+// Conversations
 router.post('/conversations', createConversation);
 router.get('/conversations/:userId', getUserConversations);
 
@@ -16,4 +16,4 @@ router.get('/conversations/:userId', getUserConversations);
 router.post('/messages', sendMessage);
 router.get('/messages/:conversationId', getMessages);
 
-module.exports = router; // ✅ CommonJS export
+module.exports = router;

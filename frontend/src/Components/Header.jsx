@@ -4,7 +4,7 @@ import Button from './ui-header/Button';
 import Avatar from './ui-header/Avatar';
 import DropdownMenu from './ui-header/DropdownMenu';
 import DropdownMenuItem from './ui-header/DropdownMenuItem';
-import { useAuthStore } from '../store/authStore';
+import { useAuthStore } from '../store/useAuthStore';
 import Filter from './Filter/Filter'; // No need to pass props anymore
 import { useNavigate } from "react-router-dom";
 import ProductUploadModal from './ProductUploadModal';
@@ -22,7 +22,7 @@ const Header = () => {
 
   const getMyListing = () => navigate("/mylisting");
   const getMyFavourites = () => navigate("/favourite");
-  const getChats = () => navigate('/chat')
+  const getChats = () => navigate('/chat'); // remove :conversationId placeholder
   const handleLogout = async () => await logout();
   const handleProductUpload = () => setIsUploadOpen(true);
 
@@ -48,7 +48,7 @@ const Header = () => {
             <div className="flex items-center space-x-3">
               {/* Filter component - no props needed, uses global state */}
               <Filter />
-              
+
               <Button variant="ghost" size="icon" className="relative group">
                 <Bell className="h-5 w-5 text-white/80 group-hover:text-purple-400 transition-colors" />
                 <span className="absolute -top-1 -right-1 h-4 w-4 bg-purple-500 rounded-full text-xs text-white flex items-center justify-center">

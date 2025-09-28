@@ -1,3 +1,4 @@
+// models/message.model.js
 const mongoose = require('mongoose');
 
 const messageSchema = new mongoose.Schema(
@@ -12,16 +13,16 @@ const messageSchema = new mongoose.Schema(
       ref: 'User',
       required: true,
     },
-    text: {
-      type: String,
-    },
-    image: {
-      type: String,
-    },
+    text: { type: String },
+    image: { type: String }, // single image support
+    // Optional features:
+    readBy: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }], // read receipts
+    attachments: [{ type: String }] // if you add more than one file/image later
   },
-  { timestamps: true }
+  { timestamps: true } // createdAt = send time
 );
 
-const Message = mongoose.model('Message', messageSchema);
+const Message =
+  mongoose.models.Message || mongoose.model('Message', messageSchema);
 
 module.exports = Message;

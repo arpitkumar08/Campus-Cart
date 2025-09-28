@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import { FaArrowLeft } from "react-icons/fa"
 import { Loader } from "lucide-react"
 import Input from '../../Components/Input'
-import { useAuthStore } from '../../store/authStore'
+import { useAuthStore } from '../../store/useAuthStore'
 
 
 const ForgotPasswordPage = () => {

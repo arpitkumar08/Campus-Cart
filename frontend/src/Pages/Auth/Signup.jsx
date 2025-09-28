@@ -3,7 +3,7 @@ import AuthLayout from '../../Components/AuthLayout'
 import { motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import Input from '../../Components/Input'
-import { useAuthStore } from '../../store/authStore'
+import { useAuthStore } from '../../store/useAuthStore'
 import PasswordStrengthMeter from '../../Components/PasswordStrengthMeter'
 import { Loader } from 'lucide-react'
 

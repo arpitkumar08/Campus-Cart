@@ -1,28 +1,56 @@
-import React from 'react'
-import Sidebar from './Sidebar'
-import { useChatStore } from '../../store/chatStore'
-import NoChatSelected from './NoChatSelected'
-import ChatContainer from './ChatContainer'
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { useAuthStore } from "../../store/useAuthStore";
+import ChatSidebar from "../../Pages/Chats/ChatSidebar";
+import ChatContainer from "../../Pages/Chats/ChatContainer";
+import NoChatSelected from "../../Pages/Chats/NoChatSelected";
 
 const ChatPage = () => {
+  const { conversationId } = useParams();
+  const { user } = useAuthStore();
 
-    const { selectedUser } = useChatStore()
-    return (
-        <div className='h-screen bg-zinc-700'>
-            <div className='flex items-center justify-center pt-20 px-4'>
-                <div className='rounded-lg shadow-cl w-full max-w-6xl h-[calc(100vh-8rem)]'>
-                    <div className='flex h-full rounded-lg overflow-hidden'>
-                        <Sidebar />
+  const [conversations, setConversations] = useState([]);
+  const [selectedConversation, setSelectedConversation] = useState(null);
 
-                        {!selectedUser ? <NoChatSelected /> : <ChatContainer />}
+  useEffect(() => {
+    const fetchConversations = async () => {
+      if (!user) return;
 
-                    </div>
-                </div>
+      try {
+        const res = await axios.get(
+          `http://localhost:5000/api/chats/conversations/${user._id}`
+        );
+        setConversations(res.data);
 
-            </div>
+        if (conversationId) {
+          const conv = res.data.find((c) => c._id === conversationId);
+          setSelectedConversation(conv);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    };
 
-        </div>
-    )
-}
+    fetchConversations();
+  }, [user, conversationId]);
 
-export default ChatPage
+  return (
+    <div className="flex h-screen">
+      <ChatSidebar
+        conversations={conversations}
+        setSelectedConversation={setSelectedConversation}
+        userId={user?._id}
+      />
+
+      {/* Show chat or placeholder */}
+      {selectedConversation ? (
+        <ChatContainer selectedConversation={selectedConversation} userId={user._id} />
+      ) : (
+        <NoChatSelected />
+      )}
+    </div>
+  );
+};
+
+export default ChatPage;

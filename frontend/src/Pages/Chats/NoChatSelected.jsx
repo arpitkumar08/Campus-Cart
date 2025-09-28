@@ -3,7 +3,7 @@ import React from 'react'
 
 const NoChatSelected = () => {
     return (
-        <div className='w-full flex flex-1 flex-col items-center justify-center p-16 bg-black/50'>
+        <div className='w-full flex flex-1 flex-col items-center justify-center p-16 bg-slate-900'>
             <div className='max-w-md text-center space-y-6'>
                 <div className='relative'>
                     <div className='w-8 h-8 rounded-2xl flex items-center justify-center animate-bounce'>

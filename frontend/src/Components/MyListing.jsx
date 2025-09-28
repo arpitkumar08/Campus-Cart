@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import TiltedCard from "./Home/TitleCard";
 import ProductUploadModal from "./ProductUploadModal";
 import useProductStore from "../store/productStore";
-import useAuthStore from "../store/authStore";
+import useAuthStore from "../store/useAuthStore";
 import EditIcon from "../Components/Icons/EditIcon"; // ✅ Import EditIcon component
 
 const MyListings = () => {

@@ -7,7 +7,7 @@ import EmailVerificationPage from "./pages/Auth/EmailVerificationPage";
 import ResetPasswordPage from "./Pages/Auth/ResetPasswordPage";
 import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "./components/ProtectedRoute";
-import useAuthStore from "./store/authStore";
+import useAuthStore from "./store/useAuthStore";
 import { useEffect } from "react";
 import MyListings from "./Components/MyListing";
 import FavoritesPage from "./Pages/FavoritePage";
@@ -15,57 +15,24 @@ import ProductDetails from "./Pages/ProductDetails";
 import ChatPage from "./Pages/Chats/ChatPage";
 
 const App = () => {
-
   const checkAuth = useAuthStore(state => state.checkAuth);
 
-  useEffect(() => { checkAuth(); }, []);
+  useEffect(() => {
+    checkAuth();
+  }, []);
 
   return (
     <Router>
       <Routes>
-        {/* Protected Home page */}
-        <Route
-          path="/"
-          element={
-            <ProtectedRoute>
-              <Home />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/mylisting"
-          element={
-            <ProtectedRoute>
-              <MyListings />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/favourite"
-          element={
-            <ProtectedRoute>
-              <FavoritesPage />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/details/:id"
-          element={
-            <ProtectedRoute>
-            <ProductDetails />
-            </ProtectedRoute>
-          }
-        />
-        <Route
-          path="/chat"
-          element={
-            <ProtectedRoute>
-            <ChatPage />
-            </ProtectedRoute>
-          }
-        />
+        <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+        <Route path="/mylisting" element={<ProtectedRoute><MyListings /></ProtectedRoute>} />
+        <Route path="/favourite" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
+        <Route path="/details/:id" element={<ProtectedRoute><ProductDetails /></ProtectedRoute>} />
 
-        {/* Auth pages */}
+        {/* Chat Routes */}
+        <Route path="/chat/:conversationId?" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
+
+        {/* Auth routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
