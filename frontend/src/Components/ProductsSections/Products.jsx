@@ -2,9 +2,9 @@ import React, { useEffect, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import TiltedCard from "../Home/TitleCard";
 import HeartIcon from "../Icons/HeartIcon";
-import useProductStore from "../../store/productStore";
-import useSearchStore from "../../store/searchStore";
-import useFilterStore from "../../store/filterStore";
+import useProductStore from "../../store/useProductStore";
+import useSearchStore from "../../store/useSearchStore";
+import useFilterStore from "../../store/useFilterStore";
 
 const Products = () => {
   const { products, fetchProducts, isLoading, fetchFavorites } = useProductStore();

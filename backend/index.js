@@ -15,7 +15,13 @@ dotenv.config();
 connectDB();
 
 const app = express();
-const server = http.createServer(app);         // ✅ Create HTTP server
+const server = http.createServer(app);  // ✅ Create HTTP server
+
+
+app.use((req, res, next) => {
+  req.io = io;
+  next();
+});
 
 const io = new Server(server, {                // ✅ Attach Socket.IO
   cors: {

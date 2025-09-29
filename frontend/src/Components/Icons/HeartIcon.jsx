@@ -1,6 +1,6 @@
 import React from 'react';
 import { Heart } from 'lucide-react';
-import useProductStore from '../../store/productStore';
+import useProductStore from '../../store/useProductStore';
 
 const HeartIcon = ({ product, size = 20, className = "", showAnimation = true }) => {
   const { toggleFavorite, isFavorite } = useProductStore();

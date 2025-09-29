@@ -9,7 +9,7 @@ import Filter from './Filter/Filter'; // No need to pass props anymore
 import { useNavigate } from "react-router-dom";
 import ProductUploadModal from './ProductUploadModal';
 import SearchBar from './ui-header/SearchBar';
-import useSearchStore from '../store/searchStore';
+import useSearchStore from '../store/useSearchStore';
 
 const Header = () => {
   const user = useAuthStore((state) => state.user);

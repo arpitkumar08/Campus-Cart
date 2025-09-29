@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Filter as FilterIcon, X, ChevronUp, ChevronDown } from 'lucide-react';
 import { categories, conditions, locations, sortOptions } from './FilterData';
-import useFilterStore from '../../store/filterStore';
+import useFilterStore from '../../store/useFilterStore';
 
 // Filter Section Component
 function FilterSection({ title, isOpen, onToggle, options, selected, onChange }) {

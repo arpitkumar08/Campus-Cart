@@ -139,14 +139,15 @@ exports.updateProduct = async (req, res) => {
 // ✅ Get product details by ID
 exports.getProductDetails = async (req, res) => {
   const { id } = req.params;
-  
+
   try {
-    const product = await Product.findById(id);
-    
+    const product = await Product.findById(id)
+      .populate("owner", "fullName email"); // ✅ populate the seller
+
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
-    
+
     res.status(200).json(product);
   } catch (error) {
     console.error("❌ Backend Error:", error);

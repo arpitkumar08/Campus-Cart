@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import TiltedCard from "../Components/Home/TitleCard";
-import useProductStore from "../store/productStore";
+import useProductStore from "../store/useProductStore";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 

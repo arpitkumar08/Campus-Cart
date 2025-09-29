@@ -7,7 +7,7 @@ const API_URL =
     ? "http://localhost:5000/api"
     : "/api";
 
-export const useProductStore = create((set, get) => ({
+export const productStore = create((set, get) => ({
   products: [],
   myProducts: [],
   favorites: [],
@@ -43,11 +43,10 @@ export const useProductStore = create((set, get) => ({
   },
 
   // Add new product
-  // Add new product
   addProduct: async (productData) => {
     set({ isLoading: true });
     try {
-      const res = await axios.post(`${API_URL}/products/addproduct`, productData, {
+      const res = await axios.post(`${API_URL}/addproduct`, productData, {
         withCredentials: true,
       });
       set((state) => ({
@@ -64,12 +63,11 @@ export const useProductStore = create((set, get) => ({
     }
   },
 
-
   // Update existing product
   updateProduct: async (productId, updatedData) => {
     set({ isLoading: true });
     try {
-      const res = await axios.put(`${API_URL}/products/update/${productId}`, updatedData, {
+      const res = await axios.put(`${API_URL}/update/${productId}`, updatedData, {
         withCredentials: true,
       });
       set((state) => ({
@@ -87,6 +85,23 @@ export const useProductStore = create((set, get) => ({
       set({ isLoading: false });
     }
   },
+
+  // Delete product
+  deleteProduct: async (productId) => {
+    try {
+      await axios.delete(`${API_URL}/deleteproduct/${productId}`, {
+        withCredentials: true,
+      });
+      set((state) => ({
+        myProducts: state.myProducts.filter((p) => p._id !== productId),
+      }));
+      toast.success("Product deleted successfully!");
+    } catch (err) {
+      console.error("❌ Error deleting product:", err);
+      toast.error(err.response?.data?.message || "Failed to delete product");
+    }
+  },
+
   // Fetch favorites
   fetchFavorites: async () => {
     set({ isLoading: true });
@@ -119,4 +134,4 @@ export const useProductStore = create((set, get) => ({
   },
 }));
 
-export default useProductStore;
+export default productStore;

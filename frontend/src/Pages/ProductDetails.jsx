@@ -14,6 +14,10 @@ const ProductDetails = () => {
     if (!user) return alert("You need to log in first!");
     if (!product || !product.owner) return console.error("Product or seller info missing!");
 
+    console.log("senderId:", user._id);
+    console.log("receiverId:", product.owner?._id);
+    console.log("productId:", product._id);
+
     try {
       const res = await axios.post(
         "http://localhost:5000/api/chats/conversations",
@@ -64,14 +68,14 @@ const ProductDetails = () => {
         <div className="flex gap-3 mt-4 flex-wrap justify-center">
           {product.images?.length > 0
             ? product.images.map((img, idx) => (
-                <img
-                  key={idx}
-                  src={img}
-                  alt={`thumbnail-${idx}`}
-                  className={`w-20 h-20 object-cover rounded-lg border cursor-pointer transition ${mainImage === img ? "border-blue-500" : "border-gray-700"}`}
-                  onClick={() => setMainImage(img)}
-                />
-              ))
+              <img
+                key={idx}
+                src={img}
+                alt={`thumbnail-${idx}`}
+                className={`w-20 h-20 object-cover rounded-lg border cursor-pointer transition ${mainImage === img ? "border-blue-500" : "border-gray-700"}`}
+                onClick={() => setMainImage(img)}
+              />
+            ))
             : <p className="text-gray-400">No other images</p>}
         </div>
       </div>
