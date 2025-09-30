@@ -9,6 +9,11 @@ const conversationSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Product",
       required: true
+    },
+    unreadCounts: {
+      type: Map,
+      of: Number,
+      default: {}
     }
   },
   { timestamps: true }

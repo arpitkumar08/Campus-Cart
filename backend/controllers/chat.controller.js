@@ -1,152 +1,103 @@
-const Conversation = require('../models/conversation.model');
-const Message = require('../models/message.model');
-const mongoose = require('mongoose');
+const Conversation = require("../models/conversation.model");
+const Message = require("../models/message.model");
+const mongoose = require("mongoose");
 
 /**
- * 🔹 Create or Get Conversation
+ * Create conversation or return existing
  */
 exports.createConversation = async (req, res) => {
-  try {
-    const { senderId, receiverId, product } = req.body;
-    console.log("📩 [createConversation] Incoming Body =>", req.body);
+  const { senderId, receiverId, product } = req.body;
+  if (!senderId || !receiverId || !product)
+    return res.status(400).json({ error: "Missing senderId, receiverId or product" });
 
-    // Validate presence
-    if (!senderId || !receiverId || !product) {
-      return res.status(400).json({ error: "Missing senderId, receiverId, or product" });
-    }
+  let conversation = await Conversation.findOne({
+    participants: { $all: [senderId, receiverId] },
+    product
+  });
 
-    // Validate ObjectIds
-    const ids = [senderId, receiverId, product];
-    if (!ids.every(id => mongoose.Types.ObjectId.isValid(id))) {
-      return res.status(400).json({ error: "Invalid senderId, receiverId, or product" });
-    }
-
-    // Prevent self-chat
-    if (senderId.toString() === receiverId.toString()) {
-      return res.status(400).json({ error: "Sender and receiver cannot be the same user" });
-    }
-
-    // Check for existing conversation
-    let conversation = await Conversation.findOne({
-      participants: { $all: [senderId, receiverId] },
-      product
+  if (!conversation) {
+    conversation = await Conversation.create({
+      participants: [senderId, receiverId],
+      product,
+      unreadCounts: { [receiverId]: 0, [senderId]: 0 }
     });
-
-    console.log("🔍 Existing conversation found? =>", !!conversation);
-
-    if (!conversation) {
-      conversation = new Conversation({
-        participants: [senderId, receiverId],
-        product
-      });
-      await conversation.save();
-      console.log("✅ New conversation created =>", conversation._id);
-    }
-
-    res.status(200).json(conversation);
-  } catch (err) {
-    console.error("❌ [createConversation] Server Error =>", err);
-    res.status(500).json({ error: err.message });
   }
+
+  res.json(conversation);
 };
 
 /**
- * 🔹 Get all conversations for a user
+ * Get all conversations for a user
  */
 exports.getUserConversations = async (req, res) => {
-  try {
-    const userId = req.params.userId;
-    console.log("📥 [getUserConversations] userId =>", userId);
+  const { userId } = req.params;
+  const conversations = await Conversation.find({
+    participants: { $in: [userId] }
+  })
+    .sort({ updatedAt: -1 })
+    .populate([{ path: "participants", select: "fullName email" },
+               { path: "product", select: "title images price" }]);
 
-    if (!mongoose.Types.ObjectId.isValid(userId)) {
-      return res.status(400).json({ error: "Invalid userId" });
-    }
+  // Attach unreadCount for this user
+  const result = conversations.map((c) => ({
+    ...c.toObject(),
+    unreadCount: c.unreadCounts?.get(userId) || 0
+  }));
 
-    const conversations = await Conversation.find({
-      participants: { $in: [userId] }
-    })
-      .sort({ updatedAt: -1 })
-      .populate([
-        { path: "participants", select: "fullName email" },
-        { path: "product", select: "title images price" }
-      ]);
-
-    console.log("✅ Conversations found =>", conversations.length);
-    conversations.forEach((c, i) => {
-      console.log(
-        `[${i}] convId:${c._id} product:${c.product?.title} participants:`,
-        c.participants.map((p) => ({ id: p._id, name: p.fullName }))
-      );
-    });
-
-    res.status(200).json(conversations);
-  } catch (err) {
-    console.error("❌ [getUserConversations] Server Error =>", err);
-    res.status(500).json({ error: err.message });
-  }
+  res.json(result);
 };
 
 /**
- * 🔹 Send message
+ * Send message and increment unread counts for others
  */
 exports.sendMessage = async (req, res) => {
-  try {
-    const { conversationId, senderId, text, image } = req.body;
+  const { conversationId, senderId, text } = req.body;
+  if (!conversationId || !senderId || !text)
+    return res.status(400).json({ error: "Missing fields" });
 
-    if (!conversationId || !senderId || !text) {
-      return res.status(400).json({ error: "Missing conversationId, senderId or text" });
+  const message = await Message.create({
+    conversationId,
+    sender: senderId,
+    text
+  });
+
+  // Increment unread count for other participants
+  const conv = await Conversation.findById(conversationId);
+  conv.participants.forEach((p) => {
+    if (p.toString() !== senderId) {
+      const prev = conv.unreadCounts?.get(p.toString()) || 0;
+      conv.unreadCounts.set(p.toString(), prev + 1);
     }
+  });
+  await conv.save();
 
-    const message = new Message({
-      conversationId,
-      sender: senderId,
-      text,
-      image
-    });
-
-    await message.save();
-
-    // ✅ Populate sender
-    const populatedMsg = await message.populate({
-      path: "sender",
-      select: "fullName email"
-    });
-
-    // ✅ Update conversation timestamp
-    await Conversation.findByIdAndUpdate(conversationId, { updatedAt: Date.now() });
-
-    // ✅ Emit to socket with populated sender
-    if (req.io) {                        // if you attached io to req in server.js
-      req.io.to(conversationId).emit("receive_message", populatedMsg);
-    }
-
-    res.status(200).json(populatedMsg);
-  } catch (err) {
-    console.error("❌ [sendMessage] Server Error =>", err);
-    res.status(500).json({ error: err.message });
-  }
+  const populated = await message.populate({ path: "sender", select: "fullName email" });
+  res.json(populated);
 };
 
 /**
- * 🔹 Get all messages of a conversation
+ * Mark conversation as read for a user
+ */
+exports.markAsRead = async (req, res) => {
+  const { userId } = req.body;
+  const { conversationId } = req.params;
+
+  const conv = await Conversation.findById(conversationId);
+  if (!conv) return res.status(404).json({ error: "Conversation not found" });
+
+  conv.unreadCounts.set(userId, 0);
+  await conv.save();
+
+  res.json({ success: true });
+};
+
+/**
+ * Get messages of a conversation
  */
 exports.getMessages = async (req, res) => {
-  try {
-    const { conversationId } = req.params;
-    console.log("📥 [getMessages] conversationId =>", conversationId);
-
-    if (!mongoose.Types.ObjectId.isValid(conversationId)) {
-      return res.status(400).json({ error: "Invalid conversationId" });
-    }
-
-    const messages = await Message.find({ conversationId })
-      .sort({ createdAt: 1 }) // oldest first
-      .populate("sender", "fullName email");
-
-    console.log(`✅ Messages found => ${messages.length}`);
-    res.status(200).json(messages);
-  } catch (err) {
-    console.error("❌ [getMessages] Server Error =>", err);
-    res.status(500).json({ error: err.message });
-  }
+  const { conversationId } = req.params;
+  const messages = await Message.find({ conversationId })
+    .sort({ createdAt: 1 })
+    .populate("sender", "fullName email");
+  res.json(messages);
 };

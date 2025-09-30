@@ -9,65 +9,63 @@ import NoChatSelected from "../../Pages/Chats/NoChatSelected";
 const ChatPage = () => {
   const { conversationId } = useParams();
   const { user } = useAuthStore();
-
   const [conversations, setConversations] = useState([]);
   const [selectedConversation, setSelectedConversation] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Fetch conversations
+  // Fetch all conversations
   useEffect(() => {
-    const fetchConversations = async () => {
+    const fetchConvs = async () => {
       if (!user) return;
-
       try {
         setLoading(true);
-        const res = await axios.get(
-          `http://localhost:5000/api/chats/conversations/${user._id}`
-        );
+        const res = await axios.get(`http://localhost:5000/api/chats/conversations/${user._id}`);
         setConversations(res.data);
 
-        // Auto-select conversation from URL param or first conversation
         if (conversationId) {
           const conv = res.data.find((c) => c._id === conversationId);
-          setSelectedConversation(conv || null);
-        } else {
-          setSelectedConversation(res.data[0] || null);
+          if (conv) handleSelectConversation(conv);
         }
-      } catch (err) {
-        console.error("❌ Error fetching conversations:", err);
       } finally {
         setLoading(false);
       }
     };
-
-    fetchConversations();
+    fetchConvs();
   }, [user, conversationId]);
 
-  // Listen for ESC key to deselect conversation
+  // Esc key to close chat
   useEffect(() => {
-    const handleEscKey = (e) => {
-      if (e.key === "Escape") {
-        setSelectedConversation(null);
-      }
-    };
-
-    window.addEventListener("keydown", handleEscKey);
-
-    return () => {
-      window.removeEventListener("keydown", handleEscKey);
-    };
+    const esc = (e) => e.key === "Escape" && setSelectedConversation(null);
+    window.addEventListener("keydown", esc);
+    return () => window.removeEventListener("keydown", esc);
   }, []);
+
+  // 🔹 When user opens a chat, mark as read
+  const handleSelectConversation = async (conv) => {
+    setSelectedConversation(conv);
+    try {
+      await axios.post(
+        `http://localhost:5000/api/chats/conversations/${conv._id}/read`,
+        { userId: user._id }
+      );
+      // Update UI immediately
+      setConversations((prev) =>
+        prev.map((c) => (c._id === conv._id ? { ...c, unreadCount: 0 } : c))
+      );
+    } catch (err) {
+      console.error("Failed to mark read:", err);
+    }
+  };
 
   return (
     <div className="flex h-screen">
       <ChatSidebar
         conversations={conversations}
-        setSelectedConversation={setSelectedConversation}
+        setSelectedConversation={handleSelectConversation}
         userId={user?._id}
         loading={loading}
+        selectedConversation={selectedConversation}
       />
-
-      {/* Show chat or placeholder */}
       {selectedConversation ? (
         <ChatContainer
           selectedConversation={selectedConversation}
