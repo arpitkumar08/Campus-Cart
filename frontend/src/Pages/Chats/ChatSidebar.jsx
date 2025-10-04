@@ -1,12 +1,20 @@
 import React from "react";
 import SidebarSkeleton from "../../Components/Skeletons/SidebarSkeleton";
+import { FaArrowLeft } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
 
 const ChatSidebar = ({ conversations, setSelectedConversation, userId, loading, selectedConversation }) => {
+  const navigate = useNavigate();
+
   if (loading) return <SidebarSkeleton />;
 
   return (
     <div className="w-80 bg-gray-900 text-white h-full border-r border-gray-700 flex flex-col">
-      <h2 className="text-xl font-bold p-4 border-b border-gray-700">Chats</h2>
+      <h2 className="text-xl font-bold p-4 border-b border-gray-700 flex items-center gap-2">
+        {/* ⚠️ Fixed: wrap navigate in a function so it runs on click, not on render */}
+        <FaArrowLeft className="cursor-pointer hover:text-slate-400" onClick={() => navigate('/')} />
+        Chats
+      </h2>
 
       <div className="flex-1 overflow-y-auto">
         {(!conversations || conversations.length === 0) ? (
