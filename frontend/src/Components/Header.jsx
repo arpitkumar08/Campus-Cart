@@ -107,10 +107,6 @@ const Header = () => {
                 size="icon"
                 className="relative group"
                 onClick={() => {
-                  console.log(
-                    "🔔 Notification button clicked, unreadCount:",
-                    unreadCount
-                  );
                   setIsNotificationOpen(!isNotificationOpen);
                 }}
               >
@@ -165,16 +161,16 @@ const Header = () => {
                       </p>
                     )}
                   </div>
-                   {unreadConversations.length > 0 && (
-                        <div className="p-2 bg-gray-900/50 border-t border-gray-700 text-center">
-                            <button
-                                onClick={getChats}
-                                className="w-full text-purple-400 hover:text-purple-300 text-sm py-1 font-medium transition-colors"
-                            >
-                                View All Chats
-                            </button>
-                        </div>
-                    )}
+                  {unreadConversations.length > 0 && (
+                    <div className="p-2 bg-gray-900/50 border-t border-gray-700 text-center">
+                      <button
+                        onClick={getChats}
+                        className="w-full text-purple-400 hover:text-purple-300 text-sm py-1 font-medium transition-colors"
+                      >
+                        View All Chats
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 

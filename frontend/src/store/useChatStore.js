@@ -59,7 +59,6 @@ export const useChatStore = create((set, get) => ({
     },
 
     setSelectedConversation: async (conversation) => {
-        console.log("👉 Selected conversation:", conversation);
         set({ selectedConversation: conversation });
         if (conversation?._id) {
             await get().markAsRead(conversation._id);

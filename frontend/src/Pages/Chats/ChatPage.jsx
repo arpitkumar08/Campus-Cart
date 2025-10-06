@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { useParams } from "react-router-dom";
-import axios from "axios";
 import { useAuthStore } from "../../store/useAuthStore";
+import { useChatStore } from "../../store/useChatStore"; // Import Zustand store
 import ChatSidebar from "../../Pages/Chats/ChatSidebar";
 import ChatContainer from "../../Pages/Chats/ChatContainer";
 import NoChatSelected from "../../Pages/Chats/NoChatSelected";
@@ -9,71 +9,88 @@ import NoChatSelected from "../../Pages/Chats/NoChatSelected";
 const ChatPage = () => {
   const { conversationId } = useParams();
   const { user } = useAuthStore();
-  const [conversations, setConversations] = useState([]);
-  const [selectedConversation, setSelectedConversation] = useState(null);
-  const [loading, setLoading] = useState(true);
 
-  // Fetch all conversations
+  // ✅ Get state and actions from the central Zustand store
+  const {
+    conversations,
+    getConversations,
+    selectedConversation,
+    setSelectedConversation,
+  } = useChatStore();
+
+  // You can get loading state from the store as well
+  const loading = useChatStore((state) => state.isMessagesLoading);
+
+  // Fetch conversations using the store's action when the component mounts
   useEffect(() => {
-    const fetchConvs = async () => {
-      if (!user) return;
-      try {
-        setLoading(true);
-        const res = await axios.get(`http://localhost:5000/api/chats/conversations/${user._id}`);
-        setConversations(res.data);
+    if (user?._id) {
+      getConversations();
+    }
+  }, [user, getConversations]);
 
-        if (conversationId) {
-          const conv = res.data.find((c) => c._id === conversationId);
-          if (conv) handleSelectConversation(conv);
-        }
-      } finally {
-        setLoading(false);
+  // Effect to select a conversation if its ID is in the URL
+  useEffect(() => {
+    if (conversationId && conversations.length > 0) {
+      const conv = conversations.find((c) => c._id === conversationId);
+      if (conv) {
+        setSelectedConversation(conv);
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [conversationId, conversations]); // Intentionally not including setSelectedConversation
+
+  // Effect to handle the 'Escape' key to deselect a conversation
+  useEffect(() => {
+    const handleEsc = (e) => {
+      if (e.key === "Escape") {
+        setSelectedConversation(null);
       }
     };
-    fetchConvs();
-  }, [user, conversationId]);
-
-  // Esc key to close chat
-  useEffect(() => {
-    const esc = (e) => e.key === "Escape" && setSelectedConversation(null);
-    window.addEventListener("keydown", esc);
-    return () => window.removeEventListener("keydown", esc);
-  }, []);
-
-  // 🔹 When user opens a chat, mark as read
-  const handleSelectConversation = async (conv) => {
-    setSelectedConversation(conv);
-    try {
-      await axios.post(
-        `http://localhost:5000/api/chats/conversations/${conv._id}/read`,
-        { userId: user._id }
-      );
-      // Update UI immediately
-      setConversations((prev) =>
-        prev.map((c) => (c._id === conv._id ? { ...c, unreadCount: 0 } : c))
-      );
-    } catch (err) {
-      console.error("Failed to mark read:", err);
-    }
-  };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [setSelectedConversation]);
 
   return (
-    <div className="flex h-screen">
-      <ChatSidebar
-        conversations={conversations}
-        setSelectedConversation={handleSelectConversation}
-        userId={user?._id}
-        loading={loading}
-        selectedConversation={selectedConversation}
-      />
-      {selectedConversation ? (
-        <ChatContainer
+    <div className="flex h-screen overflow-hidden bg-gray-900 text-white">
+      {/* Sidebar Container */}
+      {/* Takes full width on mobile, partial on desktop. */}
+      {/* It's hidden on mobile screens ONLY when a conversation is selected. */}
+      <div
+        className={`
+          w-full flex-shrink-0 transition-all duration-300
+          md:w-1/3 lg:w-[380px] md:flex
+          ${selectedConversation ? 'hidden md:flex' : 'flex'}
+        `}
+      >
+        <ChatSidebar
+          conversations={conversations}
+          setSelectedConversation={setSelectedConversation}
+          userId={user?._id}
+          loading={loading}
           selectedConversation={selectedConversation}
-          userId={user._id}
         />
-      ) : (
-        <NoChatSelected />
-      )}
+      </div>
+
+      {/* Main Chat Area */}
+      {/* Takes full width on mobile when a conversation is selected. */}
+      <div
+        className={`
+          w-full flex-grow transition-all duration-300
+          ${selectedConversation ? 'flex' : 'hidden md:flex'}
+        `}
+      >
+        {selectedConversation ? (
+          <ChatContainer
+            selectedConversation={selectedConversation}
+            userId={user._id}
+            // ✅ Pass a function to handle going back on mobile
+            onBack={() => setSelectedConversation(null)}
+          />
+        ) : (
+          // This will now only be visible on desktop when no chat is selected
+          <NoChatSelected />
+        )}
+      </div>
     </div>
   );
 };
