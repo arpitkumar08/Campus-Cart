@@ -1,14 +1,20 @@
-import { createContext } from "react";
+// Context/socket.js
 import { io } from "socket.io-client";
 
-console.log("🌐 Connecting to Socket.IO backend...");
-export const socket = io("http://localhost:5000");
-export const SocketContext = createContext(socket);
-
-socket.on("connect", () => {
-  console.log("🔌 Socket connected:", socket.id);
+// Replace with your backend URL
+export const socket = io("http://localhost:5000", {
+  withCredentials: true,
 });
 
-socket.on("disconnect", () => {
-  console.log("❌ Socket disconnected");
+// Debug connection
+socket.on("connect", () => {
+});
+
+socket.on("disconnect", (reason) => {
+  console.log("❌ Socket disconnected:", reason);
+});
+
+// Debug all incoming events
+socket.onAny((event, ...args) => {
+  console.log("📡 Incoming event:", event, args);
 });

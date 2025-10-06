@@ -13,11 +13,7 @@ const ProductDetails = () => {
   const handleChatPart = async () => {
     if (!user) return alert("You need to log in first!");
     if (!product || !product.owner) return console.error("Product or seller info missing!");
-
-    console.log("senderId:", user._id);
-    console.log("receiverId:", product.owner?._id);
-    console.log("productId:", product._id);
-
+    
     try {
       const res = await axios.post(
         "http://localhost:5000/api/chats/conversations",

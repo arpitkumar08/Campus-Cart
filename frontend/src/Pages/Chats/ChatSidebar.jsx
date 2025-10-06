@@ -2,17 +2,27 @@ import React from "react";
 import SidebarSkeleton from "../../Components/Skeletons/SidebarSkeleton";
 import { FaArrowLeft } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import { useChatStore } from "../../store/useChatStore"; // ✅ import store for marking read
 
-const ChatSidebar = ({ conversations, setSelectedConversation, userId, loading, selectedConversation }) => {
+const ChatSidebar = ({
+  conversations,
+  setSelectedConversation,
+  userId,
+  loading,
+  selectedConversation,
+}) => {
   const navigate = useNavigate();
+  const markAsRead = useChatStore((state) => state.markAsRead); // ✅ mark conversation read
 
   if (loading) return <SidebarSkeleton />;
 
   return (
     <div className="w-80 bg-gray-900 text-white h-full border-r border-gray-700 flex flex-col">
       <h2 className="text-xl font-bold p-4 border-b border-gray-700 flex items-center gap-2">
-        {/* ⚠️ Fixed: wrap navigate in a function so it runs on click, not on render */}
-        <FaArrowLeft className="cursor-pointer hover:text-slate-400" onClick={() => navigate('/')} />
+        <FaArrowLeft
+          className="cursor-pointer hover:text-slate-400"
+          onClick={() => navigate("/")}
+        />
         Chats
       </h2>
 
@@ -28,14 +38,25 @@ const ChatSidebar = ({ conversations, setSelectedConversation, userId, loading, 
             const isActive = selectedConversation?._id === conv._id;
             const unread = conv.unreadCount || 0;
 
+          
+
             return (
               <div
                 key={conv._id}
-                onClick={() => setSelectedConversation(conv)}
-                className={`flex items-center justify-between p-4 cursor-pointer border-b border-gray-700 hover:bg-gray-800 transition ${isActive ? "bg-gray-800" : ""}`}
+                onClick={() => {
+                  setSelectedConversation(conv);
+                  if (unread > 0) {
+                    markAsRead(conv._id); // ✅ clear unread count
+                  }
+                }}
+                className={`flex items-center justify-between p-4 cursor-pointer border-b border-gray-700 hover:bg-gray-800 transition ${
+                  isActive ? "bg-gray-800" : ""
+                }`}
               >
                 <div>
-                  <p className="font-semibold">{conv.product?.title || "No Product"}</p>
+                  <p className="font-semibold">
+                    {conv.product?.title || "No Product"}
+                  </p>
                   <p className="text-sm text-gray-400">
                     {otherUser ? otherUser.fullName : "Unknown"}
                   </p>
