@@ -143,7 +143,7 @@ const Header = () => {
                                 <p className="text-sm text-gray-200">
                                   New message about{" "}
                                   <span className="font-bold text-white">
-                                    {conv.productId?.name || "an item"}
+                                    {conv.product?.title || "an item"}
                                   </span>
                                 </p>
                                 <span className="text-xs text-purple-400 bg-purple-900/50 px-2 py-0.5 rounded-full mt-1 inline-block">

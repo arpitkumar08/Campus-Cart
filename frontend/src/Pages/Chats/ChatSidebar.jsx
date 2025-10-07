@@ -17,7 +17,7 @@ const ChatSidebar = ({
   if (loading) return <SidebarSkeleton />;
 
   return (
-    <div className="w-full bg-gray-900 text-white h-full b flex flex-col">
+    <div className="w-full bg-gray-900 border-r border-gray-800 text-white h-full b flex flex-col">
       <h2 className="text-xl font-bold p-4 border-b border-gray-700 flex items-center gap-2">
         <FaArrowLeft
           className="cursor-pointer hover:text-slate-400"

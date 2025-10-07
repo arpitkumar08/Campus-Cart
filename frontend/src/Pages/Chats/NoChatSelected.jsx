@@ -1,4 +1,4 @@
-import { MessageSquare } from 'lucide-react'
+import { MessagesSquare } from 'lucide-react';
 import React from 'react'
 
 const NoChatSelected = () => {
@@ -6,8 +6,8 @@ const NoChatSelected = () => {
         <div className='w-full flex flex-1 flex-col items-center justify-center p-16 bg-slate-900'>
             <div className='max-w-md text-center space-y-6'>
                 <div className='relative'>
-                    <div className='w-8 h-8 rounded-2xl flex items-center justify-center animate-bounce'>
-                        <MessageSquare className='w-8 h-8 text-white' />
+                    <div className='w-20 h-18 rounded-2xl flex items-center justify-center animate-bounce'>
+                        <MessagesSquare className='w-12 h-12 text-white' />
 
                     </div>
 
