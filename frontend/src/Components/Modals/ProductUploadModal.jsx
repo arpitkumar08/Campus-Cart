@@ -1,7 +1,7 @@
   import React, { useState, useEffect } from "react";
   import { AnimatePresence, motion } from "framer-motion";
-  import useProductStore from "../store/useProductStore";
-  import useAuthStore from "../store/useAuthStore";
+  import useProductStore from "../../store/useProductStore";
+  import useAuthStore from "../../store/useAuthStore";
   import toast from "react-hot-toast";
   import { Loader } from "lucide-react";
 

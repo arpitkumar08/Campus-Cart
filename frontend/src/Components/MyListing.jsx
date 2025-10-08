@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import TiltedCard from "./Home/TitleCard";
-import ProductUploadModal from "./ProductUploadModal";
+import ProductUploadModal from "./Modals/ProductUploadModal";
 import useProductStore from "../store/useProductStore";
 import useAuthStore from "../store/useAuthStore";
 import EditIcon from "../Components/Icons/EditIcon"; // ✅ Import EditIcon component

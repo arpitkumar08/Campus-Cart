@@ -7,7 +7,7 @@ import DropdownMenuItem from "./ui-header/DropdownMenuItem";
 import { useAuthStore } from "../store/useAuthStore";
 import Filter from "./Filter/Filter";
 import { useNavigate } from "react-router-dom";
-import ProductUploadModal from "./ProductUploadModal";
+import ProductUploadModal from "./Modals/ProductUploadModal";
 import SearchBar from "./ui-header/SearchBar";
 import useSearchStore from "../store/useSearchStore";
 import { socket } from "../Context/socket";

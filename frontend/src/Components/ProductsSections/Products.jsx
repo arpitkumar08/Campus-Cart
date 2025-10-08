@@ -147,7 +147,7 @@ const Products = () => {
                       <div className="absolute bottom-0 left-0 right-0 bg-gray-900/90 text-white px-3 py-2 rounded-b-lg flex flex-col gap-1 z-10">
                         <span className="text-sm font-bold truncate">📌 {product.title}</span>
                         <span className="text-sm font-semibold text-green-400">💰 ₹{product.price}</span>
-                        <div className="flex items-center justify-between text-xs text-gray-400">
+                        <div className="flex flex-col items-start gap-2 justify-between text-xs text-gray-400">
                           <span className="truncate">📍 {product.location}</span>
                           {product.condition && (
                             <span className="ml-2 bg-gray-700/50 px-1 py-0.5 rounded text-xs">

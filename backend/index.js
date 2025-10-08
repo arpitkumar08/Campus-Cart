@@ -9,6 +9,10 @@ const authRoutes = require('./routes/auth.route');
 const productRoutes = require('./routes/product.route');
 const favoriteRoutes = require('./routes/favourite.route');
 const chatRoute = require('./routes/chat.route');
+const reportRoutes = require('./routes/report.routes')
+
+
+
 const connectDB = require('./db/connectDB');
 
 dotenv.config();
@@ -32,9 +36,9 @@ const io = new Server(server, {                // ✅ Attach Socket.IO
 });
 
 app.use(cors({
-    origin: 'http://localhost:5173',
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
-    credentials: true
+  origin: 'http://localhost:5173',
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true
 }));
 app.use(express.json());
 app.use(cookieParser());
@@ -44,32 +48,33 @@ app.use("/api/auth", authRoutes);
 app.use("/api", productRoutes);
 app.use('/api/favorite', favoriteRoutes);
 app.use('/api/chats', chatRoute);
+app.use('/api/reports', reportRoutes)
 
 // ✅ Socket.IO Logic
 io.on("connection", (socket) => {
-    console.log("🔌 User connected:", socket.id);
+  console.log("🔌 User connected:", socket.id);
 
-    // Join conversation room
-    socket.on("join_conversation", (conversationId) => {
-        socket.join(conversationId);
-        console.log(`User joined room: ${conversationId}`);
-    });
+  // Join conversation room
+  socket.on("join_conversation", (conversationId) => {
+    socket.join(conversationId);
+    console.log(`User joined room: ${conversationId}`);
+  });
 
-    // Receive & broadcast messages
-    socket.on("send_message", (data) => {
-        /*
-          data = {
-            conversationId,
-            senderId,
-            text
-          }
-        */
-        io.to(data.conversationId).emit("receive_message", data);
-    });
+  // Receive & broadcast messages
+  socket.on("send_message", (data) => {
+    /*
+      data = {
+        conversationId,
+        senderId,
+        text
+      }
+    */
+    io.to(data.conversationId).emit("receive_message", data);
+  });
 
-    socket.on("disconnect", () => {
-        console.log("❌ User disconnected:", socket.id);
-    });
+  socket.on("disconnect", () => {
+    console.log("❌ User disconnected:", socket.id);
+  });
 });
 
 // ✅ Start Server
