@@ -1,32 +1,43 @@
-const Report = require('../models/report.model')
-const Product = require('../models/product.model')
+const Report = require("../models/report.model");
+const Product = require("../models/product.model");
+
 // POST: Report a product
 exports.reportProduct = async (req, res) => {
   try {
-    const { productId, reason } = req.body;
-    const userId = req.user._id; // get from auth middleware
+    const { productId, reason, details } = req.body;
+    const userId = req.user._id; // from auth middleware
 
-    // check if already reported
-    const existingReport = await Report.findOne({ productId, reportedBy: userId });
+    if (!productId || !reason)
+      return res.status(400).json({ message: "Missing required fields." });
+
+    // Check if already reported by this user
+    const existingReport = await Report.findOne({
+      productId,
+      reportedBy: userId,
+    });
     if (existingReport) {
-      return res.status(400).json({ message: "You already reported this product." });
+      return res
+        .status(400)
+        .json({ message: "You already reported this product." });
     }
 
+    // Create new report
     const newReport = new Report({
       productId,
       reportedBy: userId,
       reason,
+      details,
     });
 
     await newReport.save();
     return res.status(201).json({ message: "Product reported successfully." });
   } catch (err) {
-    console.error(err);
+    console.error("Report error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
 
-// GET: Fetch all reports (for Admin)
+// GET: Fetch all reports (Admin only)
 exports.getAllReports = async (req, res) => {
   try {
     const reports = await Report.find()
@@ -34,7 +45,7 @@ exports.getAllReports = async (req, res) => {
       .populate("reportedBy", "name email");
     res.json(reports);
   } catch (err) {
-    console.error(err);
+    console.error("Get reports error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -47,9 +58,9 @@ exports.deleteReportedProduct = async (req, res) => {
     await Product.findByIdAndDelete(productId);
     await Report.deleteMany({ productId });
 
-    res.json({ message: "Product and its reports deleted successfully." });
+    res.json({ message: "Product and related reports deleted successfully." });
   } catch (err) {
-    console.error(err);
+    console.error("Delete report error:", err);
     res.status(500).json({ message: "Server error" });
   }
 };
