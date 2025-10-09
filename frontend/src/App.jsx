@@ -13,6 +13,7 @@ import MyListings from "./Components/MyListing";
 import FavoritesPage from "./Pages/FavoritePage";
 import ProductDetails from "./Pages/ProductDetails";
 import ChatPage from "./Pages/Chats/ChatPage";
+import Dashboard from "./Admin/Pages/Dashboard";
 
 const App = () => {
   const checkAuth = useAuthStore(state => state.checkAuth);
@@ -38,6 +39,10 @@ const App = () => {
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/verify-email" element={<EmailVerificationPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
+
+
+        {/* Admin Routes */}
+        <Route path="/admin/dashboard" element={<Dashboard />} />
       </Routes>
 
       <Toaster />
