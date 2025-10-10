@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
   LineChart,
   Line,
@@ -14,46 +14,39 @@ import {
   Pie,
   Cell,
 } from "recharts";
+import axios from "axios";
 import { COLORS } from "../../helper/colorData";
 
-const userData = [
-  { month: "Jan", users: 400 },
-  { month: "Feb", users: 600 },
-  { month: "Mar", users: 800 },
-  { month: "Apr", users: 1000 },
-  { month: "May", users: 1200 },
-];
-
-const productData = [
-  { month: "Jan", products: 200 },
-  { month: "Feb", products: 450 },
-  { month: "Mar", products: 700 },
-  { month: "Apr", products: 650 },
-  { month: "May", products: 800 },
-];
-
-const categoryData = [
-  { name: "Electronics", value: 120 },
-  { name: "Books & Study Materials", value: 90 },
-  { name: "Clothing", value: 150 },
-  { name: "Furniture", value: 70 },
-  { name: "Sports & Fitness", value: 60 },
-  { name: "Kitchen & Dining", value: 80 },
-  { name: "Musical Instruments", value: 40 },
-  { name: "Room Decor", value: 50 },
-  { name: "Transportation", value: 30 },
-  { name: "Other", value: 20 },
-];
-
-const reportData = [
-  { name: "Fake Products", value: 120 },
-  { name: "Scams", value: 90 },
-  { name: "Inappropriate Content", value: 60 },
-];
-
 const ChartsSection = () => {
+  const [userData, setUserData] = useState([]);
+  const [productData, setProductData] = useState([]);
+  const [categoryData, setCategoryData] = useState([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // User growth
+        const userRes = await axios.get("http://localhost:5000/api/admin/charts/users", { withCredentials: true });
+        setUserData(userRes.data);
+
+        // Product growth
+        const productRes = await axios.get("http://localhost:5000/api/admin/charts/products", { withCredentials: true });
+        setProductData(productRes.data);
+
+        // Products by category
+        const categoryRes = await axios.get("http://localhost:5000/api/admin/charts/categories", { withCredentials: true });
+        setCategoryData(categoryRes.data);
+      } catch (err) {
+        console.error("Error fetching chart data:", err);
+      }
+    };
+
+    fetchData();
+  }, []);
+
   return (
     <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
+
       {/* Line Chart - User Growth */}
       <div className="bg-slate-900 border border-gray-50 p-6 rounded-2xl shadow">
         <h3 className="text-lg font-semibold mb-4 text-white">
@@ -66,17 +59,10 @@ const ChartsSection = () => {
             <YAxis stroke="#fff" />
             <Tooltip contentStyle={{ backgroundColor: "#334155", border: "none" }} />
             <Legend />
-            <Line
-              type="monotone"
-              dataKey="users"
-              stroke="#8884d8"
-              strokeWidth={3}
-              activeDot={{ r: 8 }}
-            />
+            <Line type="monotone" dataKey="users" stroke="#8884d8" strokeWidth={3} activeDot={{ r: 8 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>
-
 
       {/* Bar Chart - Products Added */}
       <div className="bg-slate-900 border border-gray-50 p-6 rounded-2xl shadow">
@@ -94,7 +80,6 @@ const ChartsSection = () => {
           </BarChart>
         </ResponsiveContainer>
       </div>
-      
 
       {/* Pie Chart - Products by Category */}
       <div className="bg-slate-900 border border-gray-50 p-6 rounded-2xl shadow">
@@ -120,8 +105,6 @@ const ChartsSection = () => {
           </PieChart>
         </ResponsiveContainer>
       </div>
-
-
     </div>
   );
 };
