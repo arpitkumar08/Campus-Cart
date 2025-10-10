@@ -10,7 +10,7 @@ const productRoutes = require('./routes/product.route');
 const favoriteRoutes = require('./routes/favourite.route');
 const chatRoute = require('./routes/chat.route');
 const reportRoutes = require('./routes/report.routes')
-
+const adminRoutes = require('./routes/admin.route')
 
 
 const connectDB = require('./db/connectDB');
@@ -49,6 +49,7 @@ app.use("/api", productRoutes);
 app.use('/api/favorite', favoriteRoutes);
 app.use('/api/chats', chatRoute);
 app.use('/api/reports', reportRoutes)
+app.use('/api/admin', adminRoutes)
 
 // ✅ Socket.IO Logic
 io.on("connection", (socket) => {
