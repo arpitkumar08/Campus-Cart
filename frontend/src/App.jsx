@@ -1,19 +1,27 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useEffect } from "react";
+import { Toaster } from "react-hot-toast";
+
 import Login from "./pages/Auth/Login";
 import Signup from "./pages/Auth/Signup";
 import Home from "./pages/Home";
 import ForgotPasswordPage from "./pages/Auth/ForgotPasswordPage";
 import EmailVerificationPage from "./pages/Auth/EmailVerificationPage";
 import ResetPasswordPage from "./Pages/Auth/ResetPasswordPage";
-import { Toaster } from "react-hot-toast";
 import ProtectedRoute from "./components/ProtectedRoute";
 import useAuthStore from "./store/useAuthStore";
-import { useEffect } from "react";
+
 import MyListings from "./Components/MyListing";
 import FavoritesPage from "./Pages/FavoritePage";
 import ProductDetails from "./Pages/ProductDetails";
 import ChatPage from "./Pages/Chats/ChatPage";
+
+// Admin pages
+import AdminLayout from "./Components/Layout/AdminLayout";
 import Dashboard from "./Admin/Pages/Dashboard";
+import Users from "./Admin/Pages/Users";
+import Products from "./Admin/Pages/Products";
+import ReportedProducts from "./Admin/Pages/ReportedProducts";
 
 const App = () => {
   const checkAuth = useAuthStore(state => state.checkAuth);
@@ -25,24 +33,28 @@ const App = () => {
   return (
     <Router>
       <Routes>
+        {/* User Routes */}
         <Route path="/" element={<ProtectedRoute><Home /></ProtectedRoute>} />
         <Route path="/mylisting" element={<ProtectedRoute><MyListings /></ProtectedRoute>} />
         <Route path="/favourite" element={<ProtectedRoute><FavoritesPage /></ProtectedRoute>} />
         <Route path="/details/:id" element={<ProtectedRoute><ProductDetails /></ProtectedRoute>} />
-
-        {/* Chat Routes */}
         <Route path="/chat/:conversationId?" element={<ProtectedRoute><ChatPage /></ProtectedRoute>} />
 
-        {/* Auth routes */}
+        {/* Auth Routes */}
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/verify-email" element={<EmailVerificationPage />} />
         <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
-
-        {/* Admin Routes */}
-        <Route path="/admin/dashboard" element={<Dashboard />} />
+        {/* Admin Routes with persistent sidebar */}
+        <Route path="/admin" element={<AdminLayout />}>
+          <Route path="dashboard" element={<Dashboard />} />
+          <Route path="users" element={<Users />} />
+          <Route path="products" element={<Products />} />
+          <Route path="reports" element={<ReportedProducts />} />
+          {/* <Route path="settings" element={<Settings />} /> */}
+        </Route>
       </Routes>
 
       <Toaster />
