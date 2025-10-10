@@ -37,6 +37,67 @@ const getReportedProductCount = async (req, res) => {
     }
 }
 
-// You can add more controllers here later, e.g., packages, orders, chart data
+const getUserGrowth = async (req, res) => {
+    try {
+        const growth = await User.aggregate([
+            {
+                $group: {
+                    _id: { $month: '$createdAt' },
+                    users: { $sum: 1 },
+                }
+            }
+        ])
+        const formatted = growth.map(g => ({
+            month: new Date(0, g._id - 1).toLocaleString("default", { month: "short" }),
+            users: g.users,
+        }));
 
-module.exports = { getUsersCount, getProductsCount, getReportedProductCount };
+        res.json(formatted);
+    } catch (error) {
+        console.error("Error fetching user growth:", error);
+        res.status(500).json({ message: "Error fetching user growth", error: error.message });
+    }
+}
+
+
+const getProductGrowth = async (req, res) => {
+    try {
+        const growth = await Product.aggregate([
+            { $group: { _id: { $month: "$createdAt" }, products: { $sum: 1 } } },
+            { $sort: { "_id": 1 } },
+        ]);
+
+
+        const formatted = growth.map(g => ({
+            month: new Date(0, g._id - 1).toLocaleString("default", { month: "short" }),
+            products: g.products,
+        }));
+
+        res.json(formatted);
+    } catch (error) {
+        console.error("Error fetching product growth:", error);
+        res.status(500).json({ message: "Error fetching product growth", error: error.message });
+    }
+};
+
+
+const getProductByCategory = async (req, res) => {
+    try {
+        const categories = await Product.aggregate([
+            { $group: { _id: "$category", value: { $sum: 1 } } }
+        ])
+
+        const formatted = categories.map(c => ({
+            name: c._id || "Uncategorized",
+            value: c.value,
+        }))
+
+        res.json(formatted)
+
+    } catch (error) {
+        console.error("Error fetching products by category:", error);
+        res.status(500).json({ message: "Error fetching products by category", error: error.message });
+    }
+}
+
+module.exports = { getUsersCount, getProductsCount, getReportedProductCount, getUserGrowth, getProductGrowth, getProductByCategory };

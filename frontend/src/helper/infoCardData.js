@@ -1,21 +1,19 @@
 import { Users, Package, ShoppingBag, Box } from "lucide-react";
 import axios from "axios";
 
-// Function to fetch counts from backend and return card data
 export const getCardData = async () => {
   try {
-    const [usersRes, productsRes, reportsRes, itemsSoldRes] = await Promise.all([
-      axios.get("/api/admin/users/count", { withCredentials: true }),
-      axios.get("/api/admin/products/count", { withCredentials: true }),
-      axios.get("/api/admin/reports/count", { withCredentials: true }),
-      axios.get("/api/admin/items-sold/count", { withCredentials: true }),
+    const [usersRes, productsRes, reportsRes] = await Promise.all([
+      axios.get("http://localhost:5000/api/admin/users/count", { withCredentials: true }),
+      axios.get("http://localhost:5000/api/admin/products/count", { withCredentials: true }),
+      axios.get("http://localhost:5000/api/admin/reportedProducts/count", { withCredentials: true }),
     ]);
 
     return [
       {
         title: "Total Users",
         value: usersRes.data.count,
-        change: "+8.2%", // you can optionally fetch from backend
+        change: "+8.2%",
         trend: "up",
         icon: Users,
         color: "blue",
@@ -38,7 +36,7 @@ export const getCardData = async () => {
       },
       {
         title: "Total Items Sold",
-        value: itemsSoldRes.data.count,
+        value: "-", // no endpoint yet, fallback
         change: "+6.5%",
         trend: "up",
         icon: Box,
@@ -47,6 +45,12 @@ export const getCardData = async () => {
     ];
   } catch (error) {
     console.error("Error fetching card data:", error);
-    return []; // return empty array on error
+
+    return [
+      { title: "Total Users", value: "-", change: "-", trend: "up", icon: Users, color: "blue" },
+      { title: "Total Products", value: "-", change: "-", trend: "up", icon: Package, color: "green" },
+      { title: "Total Reports", value: "-", change: "-", trend: "down", icon: ShoppingBag, color: "orange" },
+      { title: "Total Items Sold", value: "-", change: "+6.5%", trend: "up", icon: Box, color: "purple" },
+    ];
   }
 };

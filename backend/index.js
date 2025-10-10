@@ -53,7 +53,6 @@ app.use('/api/admin', adminRoutes)
 
 // ✅ Socket.IO Logic
 io.on("connection", (socket) => {
-  console.log("🔌 User connected:", socket.id);
 
   // Join conversation room
   socket.on("join_conversation", (conversationId) => {

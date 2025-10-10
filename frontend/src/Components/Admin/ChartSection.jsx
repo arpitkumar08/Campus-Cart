@@ -77,6 +77,7 @@ const ChartsSection = () => {
         </ResponsiveContainer>
       </div>
 
+
       {/* Bar Chart - Products Added */}
       <div className="bg-slate-900 border border-gray-50 p-6 rounded-2xl shadow">
         <h3 className="text-lg font-semibold mb-4 text-white">
@@ -93,6 +94,7 @@ const ChartsSection = () => {
           </BarChart>
         </ResponsiveContainer>
       </div>
+      
 
       {/* Pie Chart - Products by Category */}
       <div className="bg-slate-900 border border-gray-50 p-6 rounded-2xl shadow">
