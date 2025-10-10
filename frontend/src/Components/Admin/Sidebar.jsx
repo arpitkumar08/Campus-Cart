@@ -1,4 +1,3 @@
-// Sidebar.jsx
 import React, { useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { FaTachometerAlt, FaUsers, FaBox, FaFlag, FaCog, FaBars } from "react-icons/fa";
@@ -17,20 +16,30 @@ const Sidebar = () => {
 
   return (
     <div className="flex">
-      {/* Sidebar */}
       <aside
-        className={`bg-slate-900 text-white h-screen p-4 flex flex-col transition-all duration-300 ${
+        className={`bg-slate-900 text-white h-screen p-4 border-r border-gray-50 flex flex-col transition-all duration-500 ease-in-out ${
           isOpen ? "w-64" : "w-16"
         }`}
       >
         {/* Logo + Hamburger */}
         <div className="flex items-center justify-between mb-8">
-          {isOpen && <h1 className="text-xl font-bold">Admin Panel</h1>}
+          <div
+            className={`overflow-hidden transition-all duration-500 ease-in-out ${
+              isOpen ? "opacity-100 max-w-full" : "opacity-0 max-w-0"
+            }`}
+          >
+            <h1 className="text-xl font-bold">Admin Panel</h1>
+          </div>
           <button
+            aria-label="Toggle Sidebar"
             className="text-white text-2xl focus:outline-none"
             onClick={() => setIsOpen(!isOpen)}
           >
-            <FaBars />
+            <FaBars
+              className={`transition-transform duration-500 ${
+                isOpen ? "" : "rotate-180"
+              }`}
+            />
           </button>
         </div>
 
@@ -40,18 +49,30 @@ const Sidebar = () => {
             <Link
               key={item.name}
               to={item.path}
-              className={`flex items-center gap-3 p-2 rounded hover:bg-gray-700 transition-all ${
+              className={`flex items-center gap-3 p-2 rounded hover:bg-gray-700 transition-all duration-300 ${
                 location.pathname === item.path ? "bg-gray-700" : ""
               }`}
             >
-              <span className="text-lg">{item.icon}</span>
-              {isOpen && <span className="text-sm font-medium">{item.name}</span>}
+              <span className="text-lg flex-shrink-0 transition-transform duration-300 hover:scale-110">
+                {item.icon}
+              </span>
+              <span
+                className={`overflow-hidden transition-all duration-500 ease-in-out ${
+                  isOpen ? "opacity-100 max-w-full" : "opacity-0 max-w-0"
+                }`}
+              >
+                {item.name}
+              </span>
             </Link>
           ))}
         </nav>
       </aside>
 
-     
+      {/* Mobile Overlay */}
+      <div
+       
+        onClick={() => setIsOpen(true)}
+      />
     </div>
   );
 };

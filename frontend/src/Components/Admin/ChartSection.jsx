@@ -16,7 +16,6 @@ import {
 } from "recharts";
 import { COLORS } from "../../helper/colorData";
 
-// Sample Data
 const userData = [
   { month: "Jan", users: 400 },
   { month: "Feb", users: 600 },
@@ -78,9 +77,9 @@ const ChartsSection = () => {
         </ResponsiveContainer>
       </div>
 
-      {/* Bar Chart - Product Listings */}
-      <div className="bg-white p-6 rounded-2xl shadow">
-        <h3 className="text-lg font-semibold mb-4 text-gray-800">
+      {/* Bar Chart - Products Added */}
+      <div className="bg-slate-900 border border-gray-50 p-6 rounded-2xl shadow">
+        <h3 className="text-lg font-semibold mb-4 text-white">
           Products Added Per Month
         </h3>
         <ResponsiveContainer width="100%" height={300}>
@@ -96,8 +95,8 @@ const ChartsSection = () => {
       </div>
 
       {/* Pie Chart - Products by Category */}
-      <div className="bg-white p-6 rounded-2xl shadow">
-        <h3 className="text-lg font-semibold mb-4 text-gray-800">
+      <div className="bg-slate-900 border border-gray-50 p-6 rounded-2xl shadow">
+        <h3 className="text-lg font-semibold mb-4 text-white">
           Products by Category
         </h3>
         <ResponsiveContainer width="100%" height={300}>
@@ -120,7 +119,7 @@ const ChartsSection = () => {
         </ResponsiveContainer>
       </div>
 
-      
+
     </div>
   );
 };

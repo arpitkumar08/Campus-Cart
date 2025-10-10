@@ -11,7 +11,6 @@ const colorClasses = {
 const InfoCard = ({ title, value, change, icon: Icon, trend, color }) => {
   return (
     <div className="bg-gray-950 h-38 rounded-xl border border-gray-200 p-6 shadow-sm hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-      {/* Header */}
       <div className="flex items-center justify-between mb-2">
         <h3 className="text-sm font-medium text-white">{title}</h3>
         <div className={`p-2 rounded-lg ${colorClasses[color]}`}>
@@ -19,7 +18,6 @@ const InfoCard = ({ title, value, change, icon: Icon, trend, color }) => {
         </div>
       </div>
 
-      {/* Value and Trend */}
       <div className="space-y-1">
         <p className="text-3xl font-bold text-white">{value}</p>
         <p
