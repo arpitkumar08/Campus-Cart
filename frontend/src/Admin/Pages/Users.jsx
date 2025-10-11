@@ -1,58 +1,58 @@
 import React, { useState, useEffect } from "react";
 import Sidebar from "../../Components/Admin/Sidebar";
+import axios from "axios";
 
 const Users = () => {
   const [users, setUsers] = useState([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
 
-  // temporary sample data — replace with backend API call later
   useEffect(() => {
-    const sampleUsers = [
-      {
-        id: "USR001",
-        name: "John Doe",
-        email: "john@example.com",
-        joined: "Jan 2025",
-        lastLogin: "10 Oct 2025, 08:45 PM",
-      },
-      {
-        id: "USR002",
-        name: "Anna Smith",
-        email: "anna@example.com",
-        joined: "Feb 2025",
-        lastLogin: "09 Oct 2025, 11:10 AM",
-      },
-      {
-        id: "USR003",
-        name: "David Lee",
-        email: "david@example.com",
-        joined: "Mar 2025",
-        lastLogin: "11 Oct 2025, 06:30 PM",
-      },
-    ];
-    setUsers(sampleUsers);
+    const fetchUsers = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/admin/users");
+        // Use res.data.users since your backend wraps the array inside an object
+        setUsers(res.data.users || []);
+        setLoading(false);
+      } catch (err) {
+        console.error("Error fetching users:", err);
+        setUsers([]);
+        setLoading(false);
+      }
+    };
+
+    fetchUsers();
   }, []);
 
-  // filtered users based on search
-  const filteredUsers = users.filter((user) =>
-    user.name.toLowerCase().includes(search.toLowerCase())
-  );
+  // Filter users by name or email
+  const filteredUsers = users.filter((user) => {
+    const name = user.fullName || "";
+    const email = user.email || "";
+    const query = search.toLowerCase();
+    return name.toLowerCase().includes(query) || email.toLowerCase().includes(query);
+  });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-900 text-white">
+        Loading users...
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-slate-900">
-
-      {/* Main content */}
       <div className="flex-1 p-6">
-        {/* Header section */}
+        {/* Header */}
         <div className="flex justify-between items-center mb-6">
           <h2 className="text-2xl font-semibold text-white">Users</h2>
 
           <input
             type="text"
-            placeholder="Search user by name..."
+            placeholder="Search user by name or email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="border text-white border-gray-300 rounded-lg px-4 py-2 focus:outline-none bg-slate-800 placeholder-gray-400"
+            className="w-82 border text-white border-gray-300 rounded-lg px-12 py-2 focus:outline-none bg-slate-800 placeholder-gray-400"
           />
         </div>
 
@@ -61,39 +61,36 @@ const Users = () => {
           <table className="min-w-full text-sm text-gray-700">
             <thead className="bg-slate-900 text-white">
               <tr>
-                <th className="px-6 py-3 text-left font-semibold">User ID</th>
+                <th className="px-6 py-3 text-left font-semibold">User Id</th>
                 <th className="px-6 py-3 text-left font-semibold">Name</th>
                 <th className="px-6 py-3 text-left font-semibold">Email</th>
                 <th className="px-6 py-3 text-left font-semibold">Joined</th>
                 <th className="px-6 py-3 text-left font-semibold">Last Login</th>
-                <th className="px-6 py-3 text-left font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody>
               {filteredUsers.length > 0 ? (
                 filteredUsers.map((user) => (
                   <tr
-                    key={user.id}
+                    key={user._id}
                     className="border-t bg-slate-900 text-white hover:bg-gray-700"
                   >
-                    <td className="px-6 py-3">{user.id}</td>
-                    <td className="px-6 py-3">{user.name}</td>
+                    <td className="px-6 py-3">{user._id}</td>
+                    <td className="px-6 py-3">{user.fullName || "N/A"}</td>
                     <td className="px-6 py-3">{user.email}</td>
-                    <td className="px-6 py-3">{user.joined}</td>
-                    <td className="px-6 py-3">{user.lastLogin}</td>
                     <td className="px-6 py-3">
-                      <button className="text-blue-400 hover:underline mr-3">
-                        Edit
-                      </button>
-                      <button className="text-red-400 hover:underline">
-                        Delete
-                      </button>
+                      {new Date(user.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-3">
+                      {user.lastLogin
+                        ? new Date(user.lastLogin).toLocaleString()
+                        : "N/A"}
                     </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan="6" className="text-center py-6 text-gray-500">
+                  <td colSpan="5" className="text-center py-6 text-gray-500">
                     No users found
                   </td>
                 </tr>

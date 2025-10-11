@@ -1,3 +1,4 @@
+
 const User = require("../models/user.model");
 const Product = require('../models/product.model')
 const Report = require('../models/report.model')
@@ -100,4 +101,60 @@ const getProductByCategory = async (req, res) => {
     }
 }
 
-module.exports = { getUsersCount, getProductsCount, getReportedProductCount, getUserGrowth, getProductGrowth, getProductByCategory };
+const getAllUsers = async (req, res) => {
+    try {
+        const users = await User.find({ role: { $ne: "admin" } })
+            .select("fullName email createdAt lastLogin _id") // only send useful fields
+            .sort({ createdAt: -1 });
+
+        res.status(200).json({ success: true, users });
+        console.log(users)
+    } catch (error) {
+        console.error("Error fetching users:", error);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+}
+
+const deleteUser = async (req, res) => {
+    try {
+        if (req.user.role !== "admin") {
+            return res.status(403).json({ message: "Access denied, admin only" });
+        }
+
+        const user = await User.findByIdAndDelete(req.params.id);
+        if (!user) return res.status(404).json({ message: "User not found" });
+
+        res.status(200).json({ success: true, message: "User deleted successfully" });
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+// ✅ Edit user (optional)
+const updateUser = async (req, res) => {
+    try {
+        if (req.user.role !== "admin") {
+            return res.status(403).json({ message: "Access denied, admin only" });
+        }
+
+        const { name, email } = req.body;
+        const updatedUser = await User.findByIdAndUpdate(
+            req.params.id,
+            { name, email },
+            { new: true }
+        );
+
+        if (!updatedUser)
+            return res.status(404).json({ message: "User not found" });
+
+        res.status(200).json({ success: true, updatedUser });
+    } catch (error) {
+        console.error("Error updating user:", error);
+        res.status(500).json({ success: false, message: "Server Error" });
+    }
+};
+
+
+
+module.exports = { getUsersCount, getProductsCount, getReportedProductCount, getUserGrowth, getProductGrowth, getProductByCategory, getAllUsers, deleteUser, updateUser };
