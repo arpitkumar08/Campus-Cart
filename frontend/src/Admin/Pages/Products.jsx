@@ -29,7 +29,7 @@ const Products = () => {
     return (
       product.title.toLowerCase().includes(query) ||
       product.category.toLowerCase().includes(query) ||
-      (product.owner?.name || "").toLowerCase().includes(query)
+      (product.owner?.fullName || "").toLowerCase().includes(query)
     );
   });
 
@@ -62,7 +62,7 @@ const Products = () => {
           <table className="min-w-full text-sm text-gray-700">
             <thead className="bg-slate-900 text-white">
               <tr>
-                <th className="px-6 py-3 text-left font-semibold">Item Number</th>
+                <th className="px-6 py-3 text-left font-semibold">S.No</th>
                 <th className="px-6 py-3 text-left font-semibold">Title</th>
                 <th className="px-6 py-3 text-left font-semibold">Category</th>
                 <th className="px-6 py-3 text-left font-semibold">Price</th>

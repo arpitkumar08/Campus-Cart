@@ -90,15 +90,24 @@ exports.deleteProduct = async (req, res) => {
 // ✅ Get all products
 exports.getAllProducts = async (req, res) => {
   try {
-    const products = await Product.find().sort({ createdAt: -1 });
-    res.status(200).json(products);
+    const products = await Product.find()
+      .populate("owner", "fullName email") // populate owner info
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: products.length,
+      response: products, // match your frontend expectation
+    });
   } catch (error) {
     console.error("Error fetching products:", error);
-    res
-      .status(500)
-      .json({ message: "Error fetching products", error: error.message });
+    res.status(500).json({
+      message: "Error fetching products",
+      error: error.message,
+    });
   }
 };
+
 
 // ✅ Get products listed by the logged-in user
 exports.mylistedProducts = async (req, res) => {

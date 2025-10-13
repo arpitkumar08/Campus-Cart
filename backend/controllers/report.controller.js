@@ -1,66 +1,83 @@
-const Report = require("../models/report.model");
-const Product = require("../models/product.model");
+const Report = require('../models/report.model');
+const User = require('../models/user.model');
+const Product = require('../models/product.model');
+const mongoose = require('mongoose'); // Import Mongoose to access validation tools
 
-// POST: Report a product
-exports.reportProduct = async (req, res) => {
+
+const createReport = async (req, res) => {
+  console.log("Request Body:", req.body);
+  console.log("Authenticated User:", req.user);
+
   try {
-    const { productId, reason, details } = req.body;
-    const userId = req.user._id; // from auth middleware
-
-    if (!productId || !reason)
-      return res.status(400).json({ message: "Missing required fields." });
-
-    // Check if already reported by this user
-    const existingReport = await Report.findOne({
-      productId,
-      reportedBy: userId,
-    });
-    if (existingReport) {
-      return res
-        .status(400)
-        .json({ message: "You already reported this product." });
+    if (!req.user || !req.user.id) {
+      console.error("Authentication error: req.user is not defined on the request object.");
+      return res.status(401).json({ msg: "Not authorized, user data missing." });
     }
 
-    // Create new report
-    const newReport = new Report({
-      productId,
-      reportedBy: userId,
+    const { reportedType, reportedUser, reportedProduct, reason, details } = req.body;
+    if (!reportedType || !reason) {
+      return res.status(400).json({ msg: 'Report type and reason are required fields.' });
+    }
+
+    if (reportedType === 'User') {
+      if (!reportedUser) return res.status(400).json({ msg: 'reportedUser ID is required for User reports.' });
+      // --- FIX: Validate the ObjectId before querying the database ---
+      if (!mongoose.Types.ObjectId.isValid(reportedUser)) {
+        return res.status(400).json({ msg: 'Invalid reported user ID format.' });
+      }
+      const userToReport = await User.findById(reportedUser);
+      if (!userToReport) return res.status(404).json({ msg: 'Reported user not found.' });
+    } else if (reportedType === 'Product') {
+      if (!reportedProduct) return res.status(400).json({ msg: 'reportedProduct ID is required for Product reports.' });
+      // --- FIX: Validate the ObjectId before querying the database ---
+      if (!mongoose.Types.ObjectId.isValid(reportedProduct)) {
+        return res.status(400).json({ msg: 'Invalid reported product ID format.' });
+      }
+      const productToReport = await Product.findById(reportedProduct);
+      if (!productToReport) return res.status(404).json({ msg: 'Reported product not found.' });
+    } else {
+        return res.status(400).json({ msg: 'Invalid reportedType. Must be "User" or "Product".' });
+    }
+
+    const report = new Report({
+      reporter: req.user.id,
       reason,
       details,
+      reportedType,
+      reportedUser: reportedType === 'User' ? reportedUser : undefined,
+      reportedProduct: reportedType === 'Product' ? reportedProduct : undefined
     });
 
-    await newReport.save();
-    return res.status(201).json({ message: "Product reported successfully." });
+    await report.save();
+    return res.status(201).json({ msg: 'Report submitted successfully.', report });
+
   } catch (err) {
-    console.error("Report error:", err);
-    res.status(500).json({ message: "Server error" });
+    console.error("--- UNEXPECTED ERROR IN createReport ---");
+    console.error(err);
+    console.error("--------------------------------------");
+    res.status(500).json({ msg: 'Server error while creating report.' });
   }
 };
 
-// GET: Fetch all reports (Admin only)
-exports.getAllReports = async (req, res) => {
+const getAllReports = async (req, res) => {
   try {
-    const reports = await Report.find()
-      .populate("productId", "name price imageUrl")
-      .populate("reportedBy", "name email");
-    res.json(reports);
+    const reports = await Report.find().populate('reporter', 'name email').populate('reportedUser', 'name email').populate('reportedProduct', 'name');
+    res.status(200).json(reports);
   } catch (err) {
-    console.error("Get reports error:", err);
-    res.status(500).json({ message: "Server error" });
+    console.error(err);
+    res.status(500).json({ msg: 'Server error' });
   }
 };
 
-// DELETE: Admin deletes a reported product
-exports.deleteReportedProduct = async (req, res) => {
-  try {
-    const { productId } = req.params;
 
-    await Product.findByIdAndDelete(productId);
-    await Report.deleteMany({ productId });
-
-    res.json({ message: "Product and related reports deleted successfully." });
-  } catch (err) {
-    console.error("Delete report error:", err);
-    res.status(500).json({ message: "Server error" });
-  }
+const deleteReportedProduct = async (req, res) => {
+  res.status(200).json({ msg: `Logic to delete product with ID ${req.params.productId} goes here.` });
 };
+
+
+module.exports = {
+  createReport,
+  getAllReports,
+  deleteReportedProduct
+};
+

@@ -29,6 +29,7 @@ const ProductDetails = () => {
           },
         }
       );
+      console.log(res)
 
       // Navigate to chat page with conversation ID
       navigate(`/chat`);
@@ -46,6 +47,8 @@ const ProductDetails = () => {
           },
         });
         setProduct(res.data);
+        console.log(res);
+        
         if (res.data.images?.length > 0) setMainImage(res.data.images[0]);
       } catch (err) {
         console.error("❌ Error fetching product:", err);

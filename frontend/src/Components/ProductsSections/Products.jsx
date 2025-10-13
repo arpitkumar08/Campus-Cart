@@ -140,7 +140,7 @@ const Products = () => {
                     <>
                       <div className="absolute top-2 left-2 bg-blue-500/90 text-white text-xs font-semibold px-2 py-1 rounded-md z-20 flex items-center gap-1">
                         {product.category}
-                      </div>
+                      </div>  
                       <div className="absolute top-2 right-2 z-20">
                         <HeartIcon product={product} size={20} />
                       </div>

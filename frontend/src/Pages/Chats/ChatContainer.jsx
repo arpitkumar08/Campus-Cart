@@ -1,15 +1,17 @@
 import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { socket } from "../../Context/socket";
-import { SendHorizontal, ArrowLeft } from "lucide-react";
+import { SendHorizontal, ArrowLeft, MoreVertical } from "lucide-react";
 
 const ChatContainer = ({ selectedConversation, userId, onBack }) => {
   const [messages, setMessages] = useState([]);
   const [newMsg, setNewMsg] = useState("");
   const [loading, setLoading] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false); // For report menu
   const messagesEndRef = useRef(null);
+  const dropdownRef = useRef(null);
 
-  // Effect to fetch messages and handle socket events
+  // Fetch messages & handle socket events
   useEffect(() => {
     if (!selectedConversation) return;
 
@@ -45,10 +47,23 @@ const ChatContainer = ({ selectedConversation, userId, onBack }) => {
     };
   }, [selectedConversation]);
 
-  // Effect to auto-scroll to the bottom on new messages
+  // Auto-scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const handleSendMessage = async () => {
     if (!newMsg.trim()) return;
@@ -71,14 +86,20 @@ const ChatContainer = ({ selectedConversation, userId, onBack }) => {
       console.error("❌ Error sending message:", err);
     }
   };
-  
-  // Find the other participant in the conversation to display their name
-  const otherUser = selectedConversation?.participants.find(p => p._id !== userId);
+
+  const otherUser = selectedConversation?.participants.find(
+    (p) => p._id !== userId
+  );
+
+  const handleReportUser = () => {
+    setDropdownOpen(false);
+    alert(`Reporting user: ${otherUser?.fullName}`);
+  };
 
   return (
     <div className="flex flex-col h-full w-full">
-      {/* ✅ Responsive Header */}
-      <div className="flex items-center p-3 border-b border-gray-700 bg-gray-900 flex-shrink-0">
+      {/* Header */}
+      <div className="flex items-center p-3 border-b border-gray-700 bg-gray-900 flex-shrink-0 relative">
         <button
           onClick={onBack}
           className="mr-3 p-2 rounded-full hover:bg-gray-700 transition-colors md:hidden"
@@ -86,9 +107,31 @@ const ChatContainer = ({ selectedConversation, userId, onBack }) => {
         >
           <ArrowLeft size={20} className="text-white" />
         </button>
-        <div className="flex flex-col">
-          <span className="font-bold text-white text-lg">
+
+        <div className="flex flex-col flex-1">
+          <span className="font-bold text-white text-lg flex items-center justify-between">
             {otherUser?.fullName || "Chat"}
+
+            {/* Three-dot icon & dropdown */}
+            <div className="relative ml-2" ref={dropdownRef}>
+              <button
+                onClick={() => setDropdownOpen(!dropdownOpen)}
+                className="p-1 rounded-full hover:bg-gray-700 transition-colors"
+              >
+                <MoreVertical size={20} className="text-white" />
+              </button>
+
+              {dropdownOpen && (
+                <div className="absolute right-0 mt-2 w-40 bg-gray-800 text-white rounded shadow-lg z-50">
+                  <button
+                    onClick={handleReportUser}
+                    className="w-full text-left px-4 py-2 hover:text-red-600 transition-colors cursor-pointer"
+                  >
+                    Report User
+                  </button>
+                </div>
+              )}
+            </div>
           </span>
           <span className="text-sm text-gray-400">
             Regarding: {selectedConversation.product?.title || "Item"}
@@ -96,15 +139,18 @@ const ChatContainer = ({ selectedConversation, userId, onBack }) => {
         </div>
       </div>
 
-      {/* Messages Area */}
+      {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3">
         {loading ? (
-           <div className="m-auto text-gray-400">Loading messages...</div>
+          <div className="m-auto text-gray-400">Loading messages...</div>
         ) : messages.length === 0 ? (
-          <div className="m-auto text-gray-400">No messages yet. Start the conversation!</div>
+          <div className="m-auto text-gray-400">
+            No messages yet. Start the conversation!
+          </div>
         ) : (
           messages.map((msg, index) => {
-            const senderId = typeof msg.sender === "string" ? msg.sender : msg.sender?._id;
+            const senderId =
+              typeof msg.sender === "string" ? msg.sender : msg.sender?._id;
             const isSentByMe = senderId === userId;
             return (
               <div
@@ -146,4 +192,3 @@ const ChatContainer = ({ selectedConversation, userId, onBack }) => {
 };
 
 export default ChatContainer;
-
