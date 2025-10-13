@@ -114,46 +114,27 @@ const getAllUsers = async (req, res) => {
     }
 }
 
-const deleteUser = async (req, res) => {
+const getAllProducts = async (req, res) => {
     try {
-        if (req.user.role !== "admin") {
-            return res.status(403).json({ message: "Access denied, admin only" });
+        const response = await Product.find().populate("owner", "fullName email")
+
+        if (!response || response.length === 0) {
+            return res.status(404).json({ message: "No Products Found." })
         }
 
-        const user = await User.findByIdAndDelete(req.params.id);
-        if (!user) return res.status(404).json({ message: "User not found" });
-
-        res.status(200).json({ success: true, message: "User deleted successfully" });
+        res.status(200).json({
+            success: true,
+            count: response.length,
+            response,
+        });
     } catch (error) {
-        console.error("Error deleting user:", error);
-        res.status(500).json({ success: false, message: "Server Error" });
+        console.error("Error fetching products:", error);
+        res.status(500).json({
+            success: false,
+            message: "Server error while fetching products",
+        });
+
     }
-};
+}
 
-// ✅ Edit user (optional)
-const updateUser = async (req, res) => {
-    try {
-        if (req.user.role !== "admin") {
-            return res.status(403).json({ message: "Access denied, admin only" });
-        }
-
-        const { name, email } = req.body;
-        const updatedUser = await User.findByIdAndUpdate(
-            req.params.id,
-            { name, email },
-            { new: true }
-        );
-
-        if (!updatedUser)
-            return res.status(404).json({ message: "User not found" });
-
-        res.status(200).json({ success: true, updatedUser });
-    } catch (error) {
-        console.error("Error updating user:", error);
-        res.status(500).json({ success: false, message: "Server Error" });
-    }
-};
-
-
-
-module.exports = { getUsersCount, getProductsCount, getReportedProductCount, getUserGrowth, getProductGrowth, getProductByCategory, getAllUsers, deleteUser, updateUser };
+module.exports = { getUsersCount, getProductsCount, getReportedProductCount, getUserGrowth, getProductGrowth, getProductByCategory, getAllUsers, getAllProducts };

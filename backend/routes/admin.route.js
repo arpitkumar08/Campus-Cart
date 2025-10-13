@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { getUsersCount, getProductsCount, getReportedProductCount, getUserGrowth, getProductGrowth, getProductByCategory, getAllUsers } = require("../controllers/admin.controller");
+const { getUsersCount, getProductsCount, getReportedProductCount, getUserGrowth, getProductGrowth, getProductByCategory, getAllUsers, getAllProducts } = require("../controllers/admin.controller");
 
 
 // DASHBOARD ROUTES
@@ -13,5 +13,8 @@ router.get("/charts/categories", getProductByCategory)
 
 // USER MANAGEMENT ROUTES
 router.get("/users", getAllUsers)
+router.get("/products", getAllProducts)
+
+
 // router.put("/users/admin/users/:id")
 module.exports = router;
