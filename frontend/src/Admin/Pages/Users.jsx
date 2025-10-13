@@ -14,8 +14,8 @@ const Users = () => {
         // Use res.data.users since your backend wraps the array inside an object
         setUsers(res.data.users || []);
         setLoading(false);
-      } catch (err) {
-        console.error("Error fetching users:", err);
+      } catch (error) {
+        console.error("Error fetching users:", error);
         setUsers([]);
         setLoading(false);
       }

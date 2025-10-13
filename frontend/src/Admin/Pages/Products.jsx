@@ -1,44 +1,27 @@
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
 
 const Products = () => {
-  // Dummy product data
-  const [products] = useState([
-    {
-      _id: "1",
-      title: "Dell Inspiron Laptop",
-      category: "Electronics",
-      price: 25000,
-      condition: "Good",
-      status: "Available",
-      location: "Chennai",
-      owner: { name: "Rahul Sharma" },
-      createdAt: "2025-10-10",
-    },
-    {
-      _id: "2",
-      title: "Nike Shoes",
-      category: "Fashion",
-      price: 3000,
-      condition: "Like New",
-      status: "Sold",
-      location: "Delhi",
-      owner: { name: "Priya Verma" },
-      createdAt: "2025-09-21",
-    },
-    {
-      _id: "3",
-      title: "Wooden Study Table",
-      category: "Furniture",
-      price: 4500,
-      condition: "Excellent",
-      status: "Available",
-      location: "Bangalore",
-      owner: { name: "Amit Kumar" },
-      createdAt: "2025-08-30",
-    },
-  ]);
-
+  const [products, setProducts] = useState([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get("http://localhost:5000/api/admin/products");
+        setProducts(response.data.response || []);
+        console.log(response)
+      } catch (error) {
+        console.error("Error fetching products:", error);
+        setProducts([]); // No fallback data
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []); // Run once on component mount
 
   // Filter products by title, category, or owner name
   const filteredProducts = products.filter((product) => {
@@ -46,9 +29,17 @@ const Products = () => {
     return (
       product.title.toLowerCase().includes(query) ||
       product.category.toLowerCase().includes(query) ||
-      product.owner.name.toLowerCase().includes(query)
+      (product.owner?.name || "").toLowerCase().includes(query)
     );
   });
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-slate-900 text-white">
+        Loading products...
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-screen bg-slate-900">
@@ -91,31 +82,28 @@ const Products = () => {
                     className="border-t bg-slate-900 text-white hover:bg-gray-700 transition"
                   >
                     <td className="px-6 py-3">{index + 1}</td>
-                    <td className="px-6 py-3 font-medium text-white">
-                      {product.title}
-                    </td>
+                    <td className="px-6 py-3 font-medium text-white">{product.title}</td>
                     <td className="px-6 py-3">{product.category}</td>
                     <td className="px-6 py-3">₹{product.price}</td>
                     <td className="px-6 py-3">{product.condition}</td>
                     <td
                       className={`px-6 py-3 font-semibold ${
-                        product.status === "Available"
-                          ? "text-green-500"
-                          : "text-red-500"
+                        product.status === "Available" ? "text-green-500" : "text-red-500"
                       }`}
                     >
                       {product.status}
                     </td>
-                    <td className="px-6 py-3">{product.owner.name}</td>
+                    <td className="px-6 py-3">{product.owner?.fullName || "N/A"}</td>
                     <td className="px-6 py-3">{product.location}</td>
-                    <td className="px-6 py-3">{product.createdAt}</td>
-                   
+                    <td className="px-6 py-3">
+                      {new Date(product.createdAt).toLocaleDateString()}
+                    </td>
                   </tr>
-                ))  
+                ))
               ) : (
                 <tr>
                   <td
-                    colSpan="10"
+                    colSpan="9"
                     className="text-center py-6 text-gray-500 bg-slate-900"
                   >
                     No products found
