@@ -1,29 +1,26 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MoreHorizontal } from "lucide-react";
 import DropdownMenu from "../../Components/Admin/DropdownMenu";
+import axios from "axios";
 
-// Reusable Status Badge
-const StatusBadge = ({ status }) => {
-  const colors = {
-    "Under Review": "bg-yellow-500/20 text-yellow-400",
-    Resolved: "bg-green-500/20 text-green-400",
-    Open: "bg-blue-500/20 text-blue-400",
-    Dismissed: "bg-gray-500/20 text-gray-300",
-  };
 
-  return (
-    <span
-      className={`px-3 py-1 text-xs rounded-full font-medium ${colors[status]}`}
-    >
-      {status}
-    </span>
-  );
-};
 
 // ✅ Row component for each user
 const UserRow = ({ user }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef();
+
+
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        const response = await axios.get("http://localhost:500/api/admin/")
+      } catch (error) {
+        
+      }
+    }
+  })
+
 
   // Close dropdown if clicked outside
   useEffect(() => {
@@ -35,6 +32,8 @@ const UserRow = ({ user }) => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+
 
   return (
     <tr

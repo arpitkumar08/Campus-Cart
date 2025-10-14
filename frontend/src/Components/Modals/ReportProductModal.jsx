@@ -1,13 +1,11 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const ReportModal = ({ isOpen, onClose, item, type }) => {
-  // item = product or user object
+const ReportProductModal = ({ isOpen, onClose, productId }) => {
   const [reason, setReason] = useState("");
   const [details, setDetails] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // Reset form when modal opens/closes
   useEffect(() => {
     if (!isOpen) {
       setReason("");
@@ -15,23 +13,26 @@ const ReportModal = ({ isOpen, onClose, item, type }) => {
     }
   }, [isOpen]);
 
-  if (!isOpen || !item) return null;
+  if (!isOpen) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!reason) return alert("Please select a reason for reporting.");
+    if (!productId) return alert("Missing product ID. Cannot submit report.");
 
     try {
       setLoading(true);
+
       const payload = {
-        type, // 'product' or 'user'
-        id: type === "product" ? item.productId : item.userId,
+        reportedType: "Product",
+        reportedProduct: productId, // ✅ this must come from props
         reason,
         details,
       };
 
       const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/api/reports`,
+        "http://localhost:5000/api/reports",
         payload,
         { withCredentials: true }
       );
@@ -59,38 +60,7 @@ const ReportModal = ({ isOpen, onClose, item, type }) => {
           ✕
         </button>
 
-        <h2 className="text-lg font-semibold mb-4">
-          Report {type === "product" ? item.product : item.username}
-        </h2>
-
-        {/* Show item details */}
-        <div className="mb-4 text-sm text-gray-400">
-          {type === "product" ? (
-            <>
-              <p>
-                <strong>Product ID:</strong> {item.productId}
-              </p>
-              <p>
-                <strong>Reported by:</strong> {item.reporter}
-              </p>
-              <p>
-                <strong>Reason:</strong> {item.reason}
-              </p>
-            </>
-          ) : (
-            <>
-              <p>
-                <strong>User ID:</strong> {item.userId}
-              </p>
-              <p>
-                <strong>Username:</strong> {item.username}
-              </p>
-              <p>
-                <strong>Reported by:</strong> {item.reporter}
-              </p>
-            </>
-          )}
-        </div>
+        <h2 className="text-lg font-semibold mb-4">Report Product</h2>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <label className="flex flex-col text-sm">
@@ -133,4 +103,4 @@ const ReportModal = ({ isOpen, onClose, item, type }) => {
   );
 };
 
-export default ReportModal;
+export default ReportProductModal;

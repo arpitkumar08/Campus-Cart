@@ -5,9 +5,7 @@ const mongoose = require('mongoose'); // Import Mongoose to access validation to
 
 
 const createReport = async (req, res) => {
-  console.log("Request Body:", req.body);
-  console.log("Authenticated User:", req.user);
-
+  
   try {
     if (!req.user || !req.user.id) {
       console.error("Authentication error: req.user is not defined on the request object.");
@@ -29,7 +27,6 @@ const createReport = async (req, res) => {
       if (!userToReport) return res.status(404).json({ msg: 'Reported user not found.' });
     } else if (reportedType === 'Product') {
       if (!reportedProduct) return res.status(400).json({ msg: 'reportedProduct ID is required for Product reports.' });
-      // --- FIX: Validate the ObjectId before querying the database ---
       if (!mongoose.Types.ObjectId.isValid(reportedProduct)) {
         return res.status(400).json({ msg: 'Invalid reported product ID format.' });
       }

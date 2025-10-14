@@ -1,9 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { MoreHorizontal } from "lucide-react";
 import DropdownMenu from "../../Components/Admin/DropdownMenu";
-
-// Reusable Status Badge
-
+import axios from "axios";
 
 // ✅ Row component for each product
 const ProductRow = ({ report }) => {
@@ -22,17 +20,13 @@ const ProductRow = ({ report }) => {
   }, []);
 
   return (
-    <tr
-      key={report.id}
-      className="border-b border-white/20 hover:bg-zinc-800/60 transition-colors"
-    >
+    <tr className="border-b border-white/20 hover:bg-zinc-800/60 transition-colors">
       <td className="py-3 px-4 font-mono">{report.productId}</td>
       <td className="py-3 px-4 font-mono">{report.userId}</td>
       <td className="py-3 px-4">{report.product}</td>
       <td className="py-3 px-4 text-gray-400">{report.reporter}</td>
       <td className="py-3 px-4">{report.reason}</td>
       <td className="py-3 px-4">{report.date}</td>
-      
 
       {/* Actions */}
       <td className="py-3 px-4 relative" ref={menuRef}>
@@ -43,7 +37,6 @@ const ProductRow = ({ report }) => {
           <MoreHorizontal size={18} />
         </button>
 
-        {/* DropdownMenu receives isOpen */}
         <DropdownMenu
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
@@ -55,8 +48,7 @@ const ProductRow = ({ report }) => {
 };
 
 const ReportProducts = () => {
-  // Dummy reported products
-  const reportedProducts = [
+  const [reportedProducts, setReportedProducts] = useState([
     {
       id: 1,
       productId: "PRD-1001",
@@ -65,7 +57,6 @@ const ReportProducts = () => {
       reporter: "john_doe",
       reason: "Counterfeit item",
       date: "2025-10-10",
-      
     },
     {
       id: 2,
@@ -75,7 +66,6 @@ const ReportProducts = () => {
       reporter: "sarah_smith",
       reason: "Misleading description",
       date: "2025-10-09",
-      
     },
     {
       id: 3,
@@ -85,7 +75,6 @@ const ReportProducts = () => {
       reporter: "mike_92",
       reason: "Fake brand logo",
       date: "2025-10-08",
-      
     },
     {
       id: 4,
@@ -95,9 +84,25 @@ const ReportProducts = () => {
       reporter: "anna_k",
       reason: "Not as described",
       date: "2025-10-06",
-      
     },
-  ];
+  ]);
+
+  // Optional: fetch reports from API
+  useEffect(() => {
+    const fetchReports = async () => {
+      try {
+        const response = await axios.get(
+          "http://localhost:5000/api/reports",
+          { withCredentials: true }
+        );
+        console.log(response)
+        setReportedProducts(response.data.reports);
+      } catch (error) {
+        console.error("Error fetching reports:", error);
+      }
+    };
+    fetchReports();
+  }, []);
 
   return (
     <div className="text-white px-6 py-6">

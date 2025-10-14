@@ -1,7 +1,8 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, useMotionValue, useSpring } from "motion/react";
 import { MoreVertical } from "lucide-react";
-import ReportProductModal from "../Modals/ReportProductModal"; // import modal
+import ReportProductModal from "../Modals/ReportProductModal";
+
 
 const springValues = { damping: 30, stiffness: 120, mass: 1.5 };
 
@@ -18,14 +19,12 @@ export default function TiltedCard({
   showMobileWarning = true,
   displayOverlayContent = false,
   overlayContent = null,
-  onClick = () => {},
+  productId,
+  onClick = () => { },
 }) {
   const ref = useRef(null);
   const menuRef = useRef(null);
 
-  // Motion values for tilt effect
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
   const rotateX = useSpring(useMotionValue(0), springValues);
   const rotateY = useSpring(useMotionValue(0), springValues);
   const scale = useSpring(1, springValues);
@@ -33,7 +32,7 @@ export default function TiltedCard({
   const [lastY, setLastY] = useState(0);
 
   const [menuOpen, setMenuOpen] = useState(false);
-  const [isModalOpen, setIsModalOpen] = useState(false); // for report modal
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // ✅ Close menu when clicking outside
   useEffect(() => {
@@ -50,7 +49,7 @@ export default function TiltedCard({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Mouse events for tilt effect
+  // Tilt logic
   function handleMouse(e) {
     if (!ref.current) return;
     const rect = ref.current.getBoundingClientRect();
@@ -58,8 +57,6 @@ export default function TiltedCard({
     const offsetY = e.clientY - rect.top - rect.height / 2;
     rotateX.set((offsetY / (rect.height / 2)) * -rotateAmplitude);
     rotateY.set((offsetX / (rect.width / 2)) * rotateAmplitude);
-    x.set(e.clientX - rect.left);
-    y.set(e.clientY - rect.top);
     rotateFigcaption.set(-(offsetY - lastY) * 0.6);
     setLastY(offsetY);
   }
@@ -92,7 +89,6 @@ export default function TiltedCard({
           </div>
         )}
 
-        {/* 3D Tilted Image */}
         <motion.div
           className="relative [transform-style:preserve-3d] rounded-xl shadow-lg overflow-hidden"
           style={{ width: imageWidth, height: imageHeight, rotateX, rotateY, scale }}
@@ -103,7 +99,7 @@ export default function TiltedCard({
             className="absolute top-0 left-0 object-cover w-full h-full"
           />
 
-          {/* 3 dots menu icon (bottom-right) */}
+          {/* 3 dots menu icon */}
           <div
             className="absolute bottom-2 right-2 z-20 bg-slate-800 backdrop-blur-sm rounded-full p-1 cursor-pointer"
             onClick={(e) => {
@@ -124,7 +120,7 @@ export default function TiltedCard({
               <button
                 onClick={() => {
                   setMenuOpen(false);
-                  setIsModalOpen(true); // ✅ open modal
+                  setIsModalOpen(true);
                 }}
                 className="w-full text-left hover:text-red-600 text-gray-200 px-2 py-1 rounded-md"
               >
@@ -151,10 +147,7 @@ export default function TiltedCard({
       <ReportProductModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onSubmit={(data) => {
-          console.log("Report submitted:", data);
-          setIsModalOpen(false);
-        }}
+        productId={productId} // ✅ pass it here
       />
     </>
   );

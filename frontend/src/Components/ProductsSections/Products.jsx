@@ -17,7 +17,7 @@ const Products = () => {
     sortBy,
     hasActiveFilters
   } = useFilterStore();
-  
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -124,6 +124,7 @@ const Products = () => {
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 justify-items-center">
               {filteredProducts.map((product) => (
                 <TiltedCard
+                  productId={product._id}
                   key={product._id}
                   imageSrc={product.images?.[0] || "/images/default.png"}
                   altText={product.title}
@@ -140,7 +141,7 @@ const Products = () => {
                     <>
                       <div className="absolute top-2 left-2 bg-blue-500/90 text-white text-xs font-semibold px-2 py-1 rounded-md z-20 flex items-center gap-1">
                         {product.category}
-                      </div>  
+                      </div>
                       <div className="absolute top-2 right-2 z-20">
                         <HeartIcon product={product} size={20} />
                       </div>

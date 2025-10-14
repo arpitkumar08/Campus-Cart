@@ -13,7 +13,7 @@ const router = express.Router();
 router.post("/", protect, createReport); // For a normal user to submit a report
 
 // For admins to view all reports
-router.get("/", protect, verifyAdmin, getAllReports);
+router.get("/", protect,  getAllReports);
 
 // For admins to take action (e.g., delete a product)
 router.delete("/:productId", protect, verifyAdmin, deleteReportedProduct);

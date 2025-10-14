@@ -137,4 +137,6 @@ const getAllProducts = async (req, res) => {
     }
 }
 
+
+
 module.exports = { getUsersCount, getProductsCount, getReportedProductCount, getUserGrowth, getProductGrowth, getProductByCategory, getAllUsers, getAllProducts };

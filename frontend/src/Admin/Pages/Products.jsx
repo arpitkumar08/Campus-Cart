@@ -11,7 +11,6 @@ const Products = () => {
       try {
         const response = await axios.get("http://localhost:5000/api/admin/products");
         setProducts(response.data.response || []);
-        console.log(response)
       } catch (error) {
         console.error("Error fetching products:", error);
         setProducts([]); // No fallback data
