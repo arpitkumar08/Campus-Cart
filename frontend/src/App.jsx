@@ -21,7 +21,7 @@ import AdminLayout from "./Components/Layout/AdminLayout";
 import Dashboard from "./Admin/Pages/Dashboard";
 import Users from "./Admin/Pages/Users";
 import Products from "./Admin/Pages/Products";
-import ReportedProducts from "./Admin/Pages/ReportedProducts";
+import Reports from "./Admin/Pages/Reports";
 
 const App = () => {
   const checkAuth = useAuthStore(state => state.checkAuth);
@@ -52,7 +52,7 @@ const App = () => {
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="users" element={<Users />} />
           <Route path="products" element={<Products />} />
-          <Route path="reports" element={<ReportedProducts />} />
+          <Route path="reports" element={<Reports />} />
           {/* <Route path="settings" element={<Settings />} /> */}
         </Route>
       </Routes>

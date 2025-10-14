@@ -66,8 +66,7 @@ exports.login = async (req, res) => {
 
 
 
-        console.log("Entered password:", `${password}`);
-        console.log("DB hashed password:", user.password);
+       
 
 
         if (!user.isVerified) {
@@ -76,9 +75,7 @@ exports.login = async (req, res) => {
 
         // const isPasswordValid = await bcrypt.compare(password, user.password);
         const isPasswordValid = await bcrypt.compare(password, user.password);
-        console.log("Password valid?", isPasswordValid);
-  
-        console.log("Password valid?", isPasswordValid);
+       
 
         if (!isPasswordValid) {
             return res.status(400).json({ success: false, message: "Invalid credentials." });

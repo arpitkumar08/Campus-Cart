@@ -1,37 +1,43 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const ReportProductModal = ({ isOpen, onClose, productId }) => {
+const ReportModal = ({ isOpen, onClose, item, type }) => {
+  // item = product or user object
   const [reason, setReason] = useState("");
   const [details, setDetails] = useState("");
   const [loading, setLoading] = useState(false);
 
-  if (!isOpen) return null;
+  // Reset form when modal opens/closes
+  useEffect(() => {
+    if (!isOpen) {
+      setReason("");
+      setDetails("");
+    }
+  }, [isOpen]);
+
+  if (!isOpen || !item) return null;
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!reason) return alert("Please select a reason for reporting.");
 
     try {
       setLoading(true);
+      const payload = {
+        type, // 'product' or 'user'
+        id: type === "product" ? item.productId : item.userId,
+        reason,
+        details,
+      };
 
       const res = await axios.post(
         `${import.meta.env.VITE_API_URL}/api/reports`,
-        {
-          productId,
-          reason,
-          details,
-        },
-        {
-          withCredentials: true, // Send cookie token
-        }
+        payload,
+        { withCredentials: true }
       );
 
       alert(res.data.message || "Report submitted successfully!");
       onClose();
-      setReason("");
-      setDetails("");
     } catch (error) {
       console.error("Error submitting report:", error);
       alert(
@@ -53,11 +59,42 @@ const ReportProductModal = ({ isOpen, onClose, productId }) => {
           ✕
         </button>
 
-        <h2 className="text-lg font-semibold mb-4">Report Product</h2>
+        <h2 className="text-lg font-semibold mb-4">
+          Report {type === "product" ? item.product : item.username}
+        </h2>
+
+        {/* Show item details */}
+        <div className="mb-4 text-sm text-gray-400">
+          {type === "product" ? (
+            <>
+              <p>
+                <strong>Product ID:</strong> {item.productId}
+              </p>
+              <p>
+                <strong>Reported by:</strong> {item.reporter}
+              </p>
+              <p>
+                <strong>Reason:</strong> {item.reason}
+              </p>
+            </>
+          ) : (
+            <>
+              <p>
+                <strong>User ID:</strong> {item.userId}
+              </p>
+              <p>
+                <strong>Username:</strong> {item.username}
+              </p>
+              <p>
+                <strong>Reported by:</strong> {item.reporter}
+              </p>
+            </>
+          )}
+        </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           <label className="flex flex-col text-sm">
-            Reason
+            Reason for reporting
             <select
               value={reason}
               onChange={(e) => setReason(e.target.value)}
@@ -96,4 +133,4 @@ const ReportProductModal = ({ isOpen, onClose, productId }) => {
   );
 };
 
-export default ReportProductModal;
+export default ReportModal;
