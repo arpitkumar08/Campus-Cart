@@ -1,14 +1,13 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import axios from "axios";
 import { MoreHorizontal } from "lucide-react";
 import DropdownMenu from "../../Components/Admin/DropdownMenu";
-import axios from "axios";
 
-// ✅ Row component for each product
 const ProductRow = ({ report }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef();
 
-  // Close dropdown if clicked outside
+  // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -21,14 +20,11 @@ const ProductRow = ({ report }) => {
 
   return (
     <tr className="border-b border-white/20 hover:bg-zinc-800/60 transition-colors">
-      <td className="py-3 px-4 font-mono">{report.productId}</td>
-      <td className="py-3 px-4 font-mono">{report.userId}</td>
-      <td className="py-3 px-4">{report.product}</td>
-      <td className="py-3 px-4 text-gray-400">{report.reporter}</td>
+      <td className="py-3 px-4 font-mono">{report._id}</td>
+      <td className="py-3 px-4">{report.reportedProduct?._id || "N/A"}</td>
+      <td className="py-3 px-4 text-gray-400">{report.reporter?.email || "N/A"}</td>
       <td className="py-3 px-4">{report.reason}</td>
-      <td className="py-3 px-4">{report.date}</td>
-
-      {/* Actions */}
+      <td className="py-3 px-4">{new Date(report.createdAt).toLocaleDateString()}</td>
       <td className="py-3 px-4 relative" ref={menuRef}>
         <button
           onClick={() => setIsOpen((prev) => !prev)}
@@ -36,71 +32,37 @@ const ProductRow = ({ report }) => {
         >
           <MoreHorizontal size={18} />
         </button>
-
-        <DropdownMenu
-          isOpen={isOpen}
-          onClose={() => setIsOpen(false)}
-          type="product"
-        />
+        {isOpen && (
+          <DropdownMenu
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+            type="product"
+          />
+        )}
       </td>
     </tr>
   );
 };
 
 const ReportProducts = () => {
-  const [reportedProducts, setReportedProducts] = useState([
-    {
-      id: 1,
-      productId: "PRD-1001",
-      userId: "USR-5521",
-      product: "Vintage Leather Jacket",
-      reporter: "john_doe",
-      reason: "Counterfeit item",
-      date: "2025-10-10",
-    },
-    {
-      id: 2,
-      productId: "PRD-1002",
-      userId: "USR-5522",
-      product: "iPhone 15 Pro Max",
-      reporter: "sarah_smith",
-      reason: "Misleading description",
-      date: "2025-10-09",
-    },
-    {
-      id: 3,
-      productId: "PRD-1003",
-      userId: "USR-5533",
-      product: "Adidas Sneakers",
-      reporter: "mike_92",
-      reason: "Fake brand logo",
-      date: "2025-10-08",
-    },
-    {
-      id: 4,
-      productId: "PRD-1004",
-      userId: "USR-5544",
-      product: "Bluetooth Headphones",
-      reporter: "anna_k",
-      reason: "Not as described",
-      date: "2025-10-06",
-    },
-  ]);
+  const [reports, setReports] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Optional: fetch reports from API
   useEffect(() => {
     const fetchReports = async () => {
       try {
-        const response = await axios.get(
-          "http://localhost:5000/api/reports",
-          { withCredentials: true }
+        const res = await axios.get("http://localhost:5000/api/reports");
+        const filtered = res.data.filter(
+          (r) => r.reportedType === "Product"
         );
-        console.log(response)
-        setReportedProducts(response.data.reports);
-      } catch (error) {
-        console.error("Error fetching reports:", error);
+        setReports(filtered);
+      } catch (err) {
+        console.error("Error fetching product reports:", err);
+      } finally {
+        setLoading(false);
       }
     };
+
     fetchReports();
   }, []);
 
@@ -109,27 +71,31 @@ const ReportProducts = () => {
       <h1 className="text-2xl font-semibold mb-6">Reported Products</h1>
 
       <div className="border border-gray-50 rounded-xl p-4 bg-slate-900/50">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-gray-300 border-collapse">
-            <thead>
-              <tr className="border-b border-gray-50">
-                <th className="text-left py-3 px-4">Product ID</th>
-                <th className="text-left py-3 px-4">User ID</th>
-                <th className="text-left py-3 px-4">Product</th>
-                <th className="text-left py-3 px-4">Reporter</th>
-                <th className="text-left py-3 px-4">Reason</th>
-                <th className="text-left py-3 px-4">Date</th>
-                <th className="text-left py-3 px-4">Actions</th>
-              </tr>
-            </thead>
-
-            <tbody>
-              {reportedProducts.map((report) => (
-                <ProductRow key={report.id} report={report} />
-              ))}
-            </tbody>
-          </table>
-        </div>
+        {loading ? (
+          <p className="text-gray-400">Loading...</p>
+        ) : reports.length === 0 ? (
+          <p className="text-gray-400">No reported products found.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm text-gray-300 border-collapse">
+              <thead>
+                <tr className="border-b border-gray-50">
+                  <th className="text-left py-3 px-4">Report ID</th>
+                  <th className="text-left py-3 px-4">Product</th>
+                  <th className="text-left py-3 px-4">Reporter</th>
+                  <th className="text-left py-3 px-4">Reason</th>
+                  <th className="text-left py-3 px-4">Date</th>
+                  <th className="text-left py-3 px-4">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {reports.map((report) => (
+                  <ProductRow key={report._id} report={report} />
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
