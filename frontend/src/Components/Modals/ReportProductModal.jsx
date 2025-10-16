@@ -26,7 +26,7 @@ const ReportProductModal = ({ isOpen, onClose, productId }) => {
 
       const payload = {
         reportedType: "Product",
-        reportedProduct: productId, // ✅ this must come from props
+        reportedProduct: productId,
         reason,
         details,
       };

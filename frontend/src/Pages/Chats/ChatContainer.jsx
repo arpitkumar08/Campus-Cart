@@ -2,16 +2,18 @@ import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import { socket } from "../../Context/socket";
 import { SendHorizontal, ArrowLeft, MoreVertical } from "lucide-react";
+import ReportUserModal from "../../Components/Modals/ReportUserModal"; // ✅ Import modal
 
 const ChatContainer = ({ selectedConversation, userId, onBack }) => {
   const [messages, setMessages] = useState([]);
   const [newMsg, setNewMsg] = useState("");
   const [loading, setLoading] = useState(false);
-  const [dropdownOpen, setDropdownOpen] = useState(false); // For report menu
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false); // ✅ Modal state
+
   const messagesEndRef = useRef(null);
   const dropdownRef = useRef(null);
 
-  // Fetch messages & handle socket events
   useEffect(() => {
     if (!selectedConversation) return;
 
@@ -47,12 +49,10 @@ const ChatContainer = ({ selectedConversation, userId, onBack }) => {
     };
   }, [selectedConversation]);
 
-  // Auto-scroll to bottom on new messages
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  // Close dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
@@ -91,9 +91,24 @@ const ChatContainer = ({ selectedConversation, userId, onBack }) => {
     (p) => p._id !== userId
   );
 
+  // ✅ Open modal instead of alert
   const handleReportUser = () => {
     setDropdownOpen(false);
-    alert(`Reporting user: ${otherUser?.fullName}`);
+    setIsReportModalOpen(true);
+  };
+
+  // ✅ Submit report to backend
+  const handleReportSubmit = async (reportData) => {
+    try {
+      await axios.post("http://localhost:5000/api/reports", {
+        ...reportData,
+        reporter: userId,
+      });
+      alert("✅ Report submitted successfully!");
+    } catch (err) {
+      console.error("❌ Error submitting report:", err);
+      alert("Failed to submit report. Please try again.");
+    }
   };
 
   return (
@@ -103,7 +118,6 @@ const ChatContainer = ({ selectedConversation, userId, onBack }) => {
         <button
           onClick={onBack}
           className="mr-3 p-2 rounded-full hover:bg-gray-700 transition-colors md:hidden"
-          aria-label="Back to conversations"
         >
           <ArrowLeft size={20} className="text-white" />
         </button>
@@ -112,7 +126,6 @@ const ChatContainer = ({ selectedConversation, userId, onBack }) => {
           <span className="font-bold text-white text-lg flex items-center justify-between">
             {otherUser?.fullName || "Chat"}
 
-            {/* Three-dot icon & dropdown */}
             <div className="relative ml-2" ref={dropdownRef}>
               <button
                 onClick={() => setDropdownOpen(!dropdownOpen)}
@@ -155,11 +168,10 @@ const ChatContainer = ({ selectedConversation, userId, onBack }) => {
             return (
               <div
                 key={msg._id || index}
-                className={`p-3 rounded-lg max-w-md text-white ${
-                  isSentByMe
+                className={`p-3 rounded-lg max-w-md text-white ${isSentByMe
                     ? "bg-blue-600 self-end"
                     : "bg-gray-700 self-start"
-                }`}
+                  }`}
               >
                 {msg.text}
               </div>
@@ -187,6 +199,15 @@ const ChatContainer = ({ selectedConversation, userId, onBack }) => {
           <SendHorizontal size={20} className="text-white" />
         </button>
       </div>
+
+      {/* ✅ Report Modal */}
+      <ReportUserModal
+        isOpen={isReportModalOpen}
+        onClose={() => setIsReportModalOpen(false)}
+        onSubmit={handleReportSubmit}
+        reportedType="User"
+        reportedId={otherUser?._id}
+      />
     </div>
   );
 };
