@@ -1,7 +1,9 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import TiltedCard from "../Home/TitleCard";
 import HeartIcon from "../Icons/HeartIcon";
+import { MoreVertical } from "lucide-react";
+import ReportProductModal from "../Modals/ReportProductModal";
 import useProductStore from "../../store/useProductStore";
 import useSearchStore from "../../store/useSearchStore";
 import useFilterStore from "../../store/useFilterStore";
@@ -20,10 +22,28 @@ const Products = () => {
 
   const navigate = useNavigate();
 
+  const [menuOpenIndex, setMenuOpenIndex] = useState(null);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [selectedProductId, setSelectedProductId] = useState(null);
+  const menuRefs = useRef([]);
+
   useEffect(() => {
     fetchProducts();
     fetchFavorites();
   }, []);
+
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (
+        menuRefs.current[menuOpenIndex] &&
+        !menuRefs.current[menuOpenIndex].contains(e.target)
+      ) {
+        setMenuOpenIndex(null);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [menuOpenIndex]);
 
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
@@ -43,13 +63,9 @@ const Products = () => {
     if (selectedCategories.length > 0) {
       filtered = filtered.filter(product => selectedCategories.includes(product.category));
     }
-
-    // Condition filter
     if (selectedConditions.length > 0) {
       filtered = filtered.filter(product => selectedConditions.includes(product.condition));
     }
-
-    // Location filter
     if (selectedLocations.length > 0) {
       filtered = filtered.filter(product => selectedLocations.includes(product.location));
     }
@@ -98,68 +114,73 @@ const Products = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-900 via-gray-950 to-black">
-      <div className="px-6 py-4 border-b border-gray-800/50">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          <div className="text-white">
-            <h2 className="text-xl font-semibold">
-              {query ? `Search results for "${query}"` : 'All Products'}
-            </h2>
-            <p className="text-gray-400 text-sm mt-1">
-              {filteredProducts.length} product{filteredProducts.length !== 1 ? 's' : ''} found
-              {hasActiveFilters() && ' (filtered)'}
-            </p>
-          </div>
-          {hasActiveFilters() && (
-            <div className="flex items-center space-x-2">
-              <div className="h-2 w-2 bg-purple-500 rounded-full animate-pulse"></div>
-              <span className="text-purple-400 text-sm">Filters active</span>
-            </div>
-          )}
-        </div>
-      </div>
-
       <div className="p-6">
         <div className="max-w-7xl mx-auto">
           {filteredProducts.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 justify-items-center">
-              {filteredProducts.map((product) => (
-                <TiltedCard
-                  productId={product._id}
-                  key={product._id}
-                  imageSrc={product.images?.[0] || "/images/default.png"}
-                  altText={product.title}
-                  captionText={product.title}
-                  containerHeight="280px"
-                  containerWidth="200px"
-                  imageHeight="260px"
-                  imageWidth="200px"
-                  rotateAmplitude={10}
-                  scaleOnHover={1.05}
-                  displayOverlayContent={true}
-                  onClick={() => navigate(`/details/${product._id}`)}
-                  overlayContent={
-                    <>
-                      <div className="absolute top-2 left-2 bg-blue-500/90 text-white text-xs font-semibold px-2 py-1 rounded-md z-20 flex items-center gap-1">
-                        {product.category}
-                      </div>
-                      <div className="absolute top-2 right-2 z-20">
-                        <HeartIcon product={product} size={20} />
-                      </div>
-                      <div className="absolute bottom-0 left-0 right-0 bg-gray-900/90 text-white px-3 py-2 rounded-b-lg flex flex-col gap-1 z-10">
-                        <span className="text-sm font-bold truncate">📌 {product.title}</span>
-                        <span className="text-sm font-semibold text-green-400">💰 ₹{product.price}</span>
-                        <div className="flex flex-col items-start gap-2 justify-between text-xs text-gray-400">
-                          <span className="truncate">📍 {product.location}</span>
-                          {product.condition && (
-                            <span className="ml-2 bg-gray-700/50 px-1 py-0.5 rounded text-xs">
-                              {product.condition}
-                            </span>
-                          )}
+              {filteredProducts.map((product, index) => (
+                <div key={product._id} className="relative group">
+                  <TiltedCard
+                    productId={product._id}
+                    imageSrc={product.images?.[0] || "/images/default.png"}
+                    altText={product.title}
+                    captionText={product.title}
+                    containerHeight="280px"
+                    containerWidth="200px"
+                    imageHeight="260px"
+                    imageWidth="200px"
+                    rotateAmplitude={10}
+                    scaleOnHover={1.05}
+                    displayOverlayContent={true}
+                    onClick={() => navigate(`/details/${product._id}`)}
+                    overlayContent={
+                      <>
+                        <div className="absolute top-2 left-2 bg-blue-500/90 text-white text-xs font-semibold px-2 py-1 rounded-md z-20 flex items-center gap-1">
+                          {product.category}
                         </div>
-                      </div>
-                    </>
-                  }
-                />
+                        <div className="absolute bottom-0 left-0 right-0 bg-gray-900/90 text-white px-3 py-2 rounded-b-lg flex flex-col gap-1 z-10">
+                          <span className="text-sm font-bold truncate">📌 {product.title}</span>
+                          <span className="text-sm font-semibold text-green-400">💰 ₹{product.price}</span>
+                          <div className="flex flex-col items-start gap-2 justify-between text-xs text-gray-400">
+                            <span className="truncate">📍 {product.location}</span>
+                            {product.condition && (
+                              <span className="ml-2 bg-gray-700/50 px-1 py-0.5 rounded text-xs">
+                                {product.condition}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </>
+                    }
+                  />
+
+                  {/* Bottom-right three dots */}
+                  <div
+                    className="absolute bottom-3 right-2 z-30 bg-slate-800 backdrop-blur-sm rounded-full p-1 cursor-pointer"
+                    ref={el => menuRefs.current[index] = el}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setMenuOpenIndex(menuOpenIndex === index ? null : index);
+                      setSelectedProductId(product._id);
+                    }}
+                  >
+                    <MoreVertical className="w-5 h-5 text-white" />
+                  </div>
+
+                  {menuOpenIndex === index && (
+                    <div
+                      className="absolute bottom-10 right-2 z-40 bg-slate-900 shadow-lg rounded-md p-2 w-40 border border-gray-700"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <button
+                        onClick={() => setReportModalOpen(true)}
+                        className="w-full text-left hover:text-red-600 text-gray-200 px-2 py-1 rounded-md"
+                      >
+                        Report Product
+                      </button>
+                    </div>
+                  )}
+                </div>
               ))}
             </div>
           ) : (
@@ -179,6 +200,15 @@ const Products = () => {
           )}
         </div>
       </div>
+
+      {/* Report Modal */}
+      {reportModalOpen && (
+        <ReportProductModal
+          isOpen={reportModalOpen}
+          onClose={() => setReportModalOpen(false)}
+          productId={selectedProductId}
+        />
+      )}
     </div>
   );
 };

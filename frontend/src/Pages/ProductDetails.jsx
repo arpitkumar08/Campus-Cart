@@ -10,13 +10,14 @@ const ProductDetails = () => {
   const navigate = useNavigate();
   const { user } = useAuthStore();
 
+  // 🟢 Chat with seller
   const handleChatPart = async () => {
     if (!user) return alert("You need to log in first!");
     if (!product || !product.owner)
       return console.error("Product or seller info missing!");
 
     try {
-      const res = await axios.post(
+      await axios.post(
         "http://localhost:5000/api/chats/conversations",
         {
           senderId: user._id,
@@ -29,12 +30,31 @@ const ProductDetails = () => {
           },
         }
       );
-      console.log(res)
 
-      // Navigate to chat page with conversation ID
       navigate(`/chat`);
     } catch (error) {
       console.error("❌ Error starting chat:", error);
+    }
+  };
+
+  // 🟢 Mark product as sold
+  const handleMarkSold = async () => {
+    try {
+      await axios.put(
+        `http://localhost:5000/api/product/${product._id}/mark-sold`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("accessToken")}`,
+          },
+        }
+      );
+
+      alert("✅ Product marked as sold!");
+      setProduct({ ...product, isSold: true }); // Update UI instantly
+    } catch (error) {
+      console.error("❌ Error marking as sold:", error);
+      alert("Failed to mark product as sold.");
     }
   };
 
@@ -47,8 +67,7 @@ const ProductDetails = () => {
           },
         });
         setProduct(res.data);
-        console.log(res);
-        
+
         if (res.data.images?.length > 0) setMainImage(res.data.images[0]);
       } catch (err) {
         console.error("❌ Error fetching product:", err);
@@ -64,7 +83,6 @@ const ProductDetails = () => {
       </div>
     );
 
-  // ✅ Determine if current user is the owner of the product
   const isOwner = user?._id === product.owner?._id;
 
   return (
@@ -101,6 +119,7 @@ const ProductDetails = () => {
       <div className="flex-1 flex flex-col gap-6">
         <h1 className="text-3xl font-bold">{product.title}</h1>
         <p className="text-2xl text-green-400 font-semibold">₹{product.price}</p>
+
         <div className="border-2 w-fit py-1 px-2 rounded-full">
           <p
             className={`text-sm ${
@@ -126,13 +145,25 @@ const ProductDetails = () => {
           </div>
         )}
 
-        {/* ✅ Show Chat button only if the viewer is not the owner */}
-        {!isOwner && (
+        {/* ✅ Conditional Buttons */}
+        {!isOwner ? (
           <button
             className="mt-4 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-semibold transition w-fit"
             onClick={handleChatPart}
           >
             💬 Chat with Seller
+          </button>
+        ) : (
+          <button
+            disabled={product.isSold}
+            className={`mt-4 ${
+              product.isSold
+                ? "bg-gray-600 cursor-not-allowed"
+                : "bg-green-600 hover:bg-green-700"
+            } text-white px-6 py-3 rounded-lg font-semibold transition w-fit`}
+            onClick={handleMarkSold}
+          >
+            {product.isSold ? "✅ Product Sold" : "✔️ Mark as Sold"}
           </button>
         )}
       </div>

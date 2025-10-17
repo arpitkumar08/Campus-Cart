@@ -100,7 +100,7 @@ export default function TiltedCard({
           />
 
           {/* 3 dots menu icon */}
-          <div
+          {/* <div
             className="absolute bottom-2 right-2 z-20 bg-slate-800 backdrop-blur-sm rounded-full p-1 cursor-pointer"
             onClick={(e) => {
               e.stopPropagation();
@@ -108,7 +108,7 @@ export default function TiltedCard({
             }}
           >
             <MoreVertical className="w-5 h-5 text-white" />
-          </div>
+          </div> */}
 
           {/* Dropdown menu */}
           {menuOpen && (
