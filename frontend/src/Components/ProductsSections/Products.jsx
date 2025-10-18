@@ -132,6 +132,8 @@ const Products = () => {
                     rotateAmplitude={10}
                     scaleOnHover={1.05}
                     displayOverlayContent={true}
+                    isSold={product.status === "sold"} // ✅ add this
+
                     onClick={() => navigate(`/details/${product._id}`)}
                     overlayContent={
                       <>

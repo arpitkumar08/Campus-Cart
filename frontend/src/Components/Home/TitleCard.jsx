@@ -3,7 +3,6 @@ import { motion, useMotionValue, useSpring } from "motion/react";
 import { MoreVertical } from "lucide-react";
 import ReportProductModal from "../Modals/ReportProductModal";
 
-
 const springValues = { damping: 30, stiffness: 120, mass: 1.5 };
 
 export default function TiltedCard({
@@ -20,7 +19,8 @@ export default function TiltedCard({
   displayOverlayContent = false,
   overlayContent = null,
   productId,
-  onClick = () => { },
+  onClick = () => {},
+  isSold = false, // ✅ new prop
 }) {
   const ref = useRef(null);
   const menuRef = useRef(null);
@@ -99,7 +99,14 @@ export default function TiltedCard({
             className="absolute top-0 left-0 object-cover w-full h-full"
           />
 
-          {/* 3 dots menu icon */}
+          {/* ✅ SOLD banner */}
+          {isSold && (
+            <div className="absolute top-[45%] left-0 w-full bg-gray-950/90 text-white text-center font-bold py-1 z-20">
+              SOLD
+            </div>
+          )}
+
+          {/* 3 dots menu icon (optional) */}
           {/* <div
             className="absolute bottom-2 right-2 z-20 bg-slate-800 backdrop-blur-sm rounded-full p-1 cursor-pointer"
             onClick={(e) => {
