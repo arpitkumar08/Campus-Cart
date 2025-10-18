@@ -115,6 +115,37 @@ export const productStore = create((set, get) => ({
     }
   },
 
+
+  // mark as sold
+
+  markAsSold: async (productId) => {
+    try {
+      const res = await fetch(`http://localhost:5000/api/products/${productId}/markAsSold`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include", // 👈 important for cookies
+      });
+
+      if (!res.ok) throw new Error("Failed to mark as sold");
+
+      const updatedProduct = await res.json();
+
+      // Update the state immediately
+      set((state) => ({
+        myProducts: state.myProducts.map((p) =>
+          p._id === productId ? { ...p, status: "sold" } : p
+        ),
+      }));
+
+      console.log("✅ Product marked as sold:", updatedProduct);
+    } catch (err) {
+      console.error("❌ Error marking as sold:", err);
+    }
+  },
+
+
   // Toggle favorite
   toggleFavorite: async (productId) => {
     try {

@@ -8,7 +8,7 @@ const productSchema = new mongoose.Schema({
   isNegotiable: { type: Boolean, required: true },
   images: [{ type: String }],
   condition: { type: String, required: true },
-  status: { type: String, default: "Available" },
+  status: { type: String, default: "available" }, // 👈 add this
   location: { type: String, required: true },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
 }, { timestamps: true });

@@ -22,4 +22,6 @@ router.put("/update/:id", protect, productController.updateProduct);
 // 🔧 FIXED: Changed route to match frontend call
 router.get('/product/:id', productController.getProductDetails);
 
+router.post("/:id/markAsSold", protect, productController.markAsSold);
+
 module.exports = router;
