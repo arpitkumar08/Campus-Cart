@@ -3,17 +3,19 @@ import axios from "axios";
 
 export const getCardData = async () => {
   try {
-    const [usersRes, productsRes, reportsRes] = await Promise.all([
+    const [usersRes, productsRes, reportsRes, soldRes] = await Promise.all([
       axios.get("http://localhost:5000/api/admin/users/count", { withCredentials: true }),
       axios.get("http://localhost:5000/api/admin/products/count", { withCredentials: true }),
       axios.get("http://localhost:5000/api/admin/reportedProducts/count", { withCredentials: true }),
+      axios.get("http://localhost:5000/api/admin/products/sold/count", { withCredentials: true }),
+
     ]);
 
     return [
       {
         title: "Total Users",
         value: usersRes.data.count,
-        change: "+8.2%",
+        // change: "+8.2%",
         trend: "up",
         icon: Users,
         color: "blue",
@@ -21,7 +23,7 @@ export const getCardData = async () => {
       {
         title: "Total Products",
         value: productsRes.data.count,
-        change: "+3.4%",
+        // change: "+3.4%",
         trend: "up",
         icon: Package,
         color: "green",
@@ -29,15 +31,15 @@ export const getCardData = async () => {
       {
         title: "Total Reports",
         value: reportsRes.data.count,
-        change: "-2.1%",
+        // change: "-2.1%",
         trend: "down",
         icon: ShoppingBag,
         color: "orange",
       },
       {
         title: "Total Items Sold",
-        value: "-", // no endpoint yet, fallback
-        change: "+6.5%",
+        value: soldRes.data.count, // no endpoint yet, fallback
+        // change: "+6.5%",
         trend: "up",
         icon: Box,
         color: "purple",
