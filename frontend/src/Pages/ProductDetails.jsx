@@ -40,8 +40,8 @@ const ProductDetails = () => {
   // 🟢 Mark product as sold
   const handleMarkSold = async () => {
     try {
-      await axios.put(
-        `http://localhost:5000/api/product/${product._id}/mark-sold`,
+      await axios.post(
+        `http://localhost:5000/api/${product._id}/markAsSold`,
         {},
         {
           headers: {

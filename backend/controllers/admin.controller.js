@@ -38,6 +38,17 @@ const getReportedProductCount = async (req, res) => {
     }
 }
 
+const getSoldItemsCount = async (req, res) => {
+    try {
+        const totalSoldItems = await Product.countDocuments({ status: "sold" })
+        res.json({ count: totalSoldItems })
+    } catch (error) {
+        console.error("Error counting sold products: ", error)
+        res.status(500).json({ message: "Error counting sold products", error });
+    }
+}
+
+
 const getUserGrowth = async (req, res) => {
     try {
         const growth = await User.aggregate([
@@ -139,4 +150,4 @@ const getAllProducts = async (req, res) => {
 
 
 
-module.exports = { getUsersCount, getProductsCount, getReportedProductCount, getUserGrowth, getProductGrowth, getProductByCategory, getAllUsers, getAllProducts };
+module.exports = { getUsersCount, getProductsCount, getSoldItemsCount, getReportedProductCount, getUserGrowth, getProductGrowth, getProductByCategory, getAllUsers, getAllProducts };

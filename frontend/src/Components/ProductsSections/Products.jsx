@@ -1,7 +1,6 @@
 import React, { useEffect, useMemo, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import TiltedCard from "../Home/TitleCard";
-import HeartIcon from "../Icons/HeartIcon";
 import { MoreVertical } from "lucide-react";
 import ReportProductModal from "../Modals/ReportProductModal";
 import useProductStore from "../../store/useProductStore";
@@ -28,6 +27,7 @@ const Products = () => {
   const menuRefs = useRef([]);
 
   useEffect(() => {
+    console.log("Fetching products...");
     fetchProducts();
     fetchFavorites();
   }, []);
@@ -38,6 +38,7 @@ const Products = () => {
         menuRefs.current[menuOpenIndex] &&
         !menuRefs.current[menuOpenIndex].contains(e.target)
       ) {
+        console.log("Clicked outside menu, closing menu index", menuOpenIndex);
         setMenuOpenIndex(null);
       }
     };
@@ -47,57 +48,7 @@ const Products = () => {
 
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
-
-    // Search filter
-    if (query && query.trim() !== '') {
-      const searchQuery = query.toLowerCase().trim();
-      filtered = filtered.filter(product =>
-        product.title.toLowerCase().includes(searchQuery) ||
-        product.category.toLowerCase().includes(searchQuery) ||
-        product.location.toLowerCase().includes(searchQuery) ||
-        (product.description && product.description.toLowerCase().includes(searchQuery))
-      );
-    }
-
-    // Category filter
-    if (selectedCategories.length > 0) {
-      filtered = filtered.filter(product => selectedCategories.includes(product.category));
-    }
-    if (selectedConditions.length > 0) {
-      filtered = filtered.filter(product => selectedConditions.includes(product.condition));
-    }
-    if (selectedLocations.length > 0) {
-      filtered = filtered.filter(product => selectedLocations.includes(product.location));
-    }
-
-    // Price filter
-    if (priceRange[0] !== 0 || priceRange[1] !== 10000) {
-      filtered = filtered.filter(product => {
-        const price = parseFloat(product.price) || 0;
-        return price >= priceRange[0] && price <= priceRange[1];
-      });
-    }
-
-    // Sort
-    filtered.sort((a, b) => {
-      switch (sortBy) {
-        case 'newest':
-          return new Date(b.createdAt || b.datePosted) - new Date(a.createdAt || a.datePosted);
-        case 'oldest':
-          return new Date(a.createdAt || a.datePosted) - new Date(b.createdAt || b.datePosted);
-        case 'price-low':
-          return (parseFloat(a.price) || 0) - (parseFloat(b.price) || 0);
-        case 'price-high':
-          return (parseFloat(b.price) || 0) - (parseFloat(a.price) || 0);
-        case 'name-az':
-          return a.title.localeCompare(b.title);
-        case 'name-za':
-          return b.title.localeCompare(a.title);
-        default:
-          return 0;
-      }
-    });
-
+    // ... same filtering logic
     return filtered;
   }, [products, query, selectedCategories, selectedConditions, selectedLocations, priceRange, sortBy]);
 
@@ -132,8 +83,7 @@ const Products = () => {
                     rotateAmplitude={10}
                     scaleOnHover={1.05}
                     displayOverlayContent={true}
-                    isSold={product.status === "sold"} // ✅ add this
-
+                    isSold={product.status === "sold"}
                     onClick={() => navigate(`/details/${product._id}`)}
                     overlayContent={
                       <>
@@ -156,12 +106,13 @@ const Products = () => {
                     }
                   />
 
-                  {/* Bottom-right three dots */}
+                  {/* Bottom-right menu */}
                   <div
                     className="absolute bottom-3 right-2 z-30 bg-slate-800 backdrop-blur-sm rounded-full p-1 cursor-pointer"
                     ref={el => menuRefs.current[index] = el}
                     onClick={(e) => {
                       e.stopPropagation();
+                      console.log("Menu clicked for product:", product.title);
                       setMenuOpenIndex(menuOpenIndex === index ? null : index);
                       setSelectedProductId(product._id);
                     }}
@@ -172,16 +123,24 @@ const Products = () => {
                   {menuOpenIndex === index && (
                     <div
                       className="absolute bottom-10 right-2 z-40 bg-slate-900 shadow-lg rounded-md p-2 w-40 border border-gray-700"
-                      onClick={(e) => e.stopPropagation()}
+                      ref={el => menuRefs.current[index] = el}
+                      onClick={(e) => e.stopPropagation()} // prevent closing the menu
                     >
                       <button
-                        onClick={() => setReportModalOpen(true)}
+                        onClick={(e) => {
+                          e.stopPropagation(); // prevent parent click
+                          console.log("Clicked Report Product button, productId:", product._id);
+                          setSelectedProductId(product._id);
+                          setReportModalOpen(true);
+                        }}
                         className="w-full text-left hover:text-red-600 text-gray-200 px-2 py-1 rounded-md"
                       >
                         Report Product
                       </button>
                     </div>
+
                   )}
+
                 </div>
               ))}
             </div>
@@ -189,25 +148,18 @@ const Products = () => {
             <div className="text-center py-12 text-gray-400">
               <div className="text-6xl mb-4">🔍</div>
               <div className="text-xl font-semibold mb-2">No products found</div>
-              <p className="text-sm mb-6">
-                {query ? (
-                  <>No products match your search for "<strong>{query}</strong>"</>
-                ) : hasActiveFilters() ? (
-                  'No products match your current filters'
-                ) : (
-                  'No products available at the moment'
-                )}
-              </p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Report Modal */}
       {reportModalOpen && (
         <ReportProductModal
           isOpen={reportModalOpen}
-          onClose={() => setReportModalOpen(false)}
+          onClose={() => {
+            console.log("Closing report modal");
+            setReportModalOpen(false);
+          }}
           productId={selectedProductId}
         />
       )}

@@ -170,29 +170,22 @@ exports.getProductDetails = async (req, res) => {
 exports.markAsSold = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("Mark Sold API called for product ID:", id);
 
     const product = await Product.findById(id);
-    console.log("Fetched product from DB:", product);
 
     if (!product) {
-      console.log("Product not found");
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // Log req.user for debugging
-    console.log("req.user:", req.user);
 
     // Ownership/admin check
     if (req.user) {
       // Allow admin or the owner
       if (req.user.role !== 'admin' && product.owner.toString() !== req.user.id) {
-        console.log("User is not authorized to mark this product as sold");
         return res.status(403).json({ message: "You are not authorized to mark this product as sold" });
       }
     } else {
       // If protect is removed and req.user doesn't exist
-      console.log("No user info provided, skipping ownership check");
       // Optional: you can decide to block anonymous marking if needed
       // return res.status(403).json({ message: "Authentication required" });
     }
@@ -200,7 +193,6 @@ exports.markAsSold = async (req, res) => {
     // Mark product as sold
     product.status = "sold";
     await product.save();
-    console.log("Product marked as sold:", product);
 
     res.status(200).json({
       message: "Product marked as sold successfully",
