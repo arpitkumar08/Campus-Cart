@@ -1,5 +1,6 @@
 import { useRef, useState, useEffect } from "react";
 import { motion, useMotionValue, useSpring } from "motion/react";
+import { MoreVertical } from "lucide-react"; // 1. IMPORTED
 
 const springValues = { damping: 30, stiffness: 120, mass: 1.5 };
 
@@ -17,6 +18,9 @@ export default function TiltedCard({
   overlayContent = null,
   onClick = () => {},
   isSold = false,
+  children,
+  productId, // 2. ADDED PROP
+  onReportClick, // 3. ADDED PROP
 }) {
   const ref = useRef(null);
 
@@ -26,29 +30,35 @@ export default function TiltedCard({
   const rotateFigcaption = useSpring(0, { stiffness: 350, damping: 30, mass: 1 });
   const [lastY, setLastY] = useState(0);
 
-  function handleMouse(e) {
-    if (!ref.current) return;
-    const rect = ref.current.getBoundingClientRect();
-    const offsetX = e.clientX - rect.left - rect.width / 2;
-    const offsetY = e.clientY - rect.top - rect.height / 2;
-    rotateX.set((offsetY / (rect.height / 2)) * -rotateAmplitude);
-    rotateY.set((offsetX / (rect.width / 2)) * rotateAmplitude);
-    rotateFigcaption.set(-(offsetY - lastY) * 0.6);
-    setLastY(offsetY);
-  }
+  // --- 4. ADDED MENU LOGIC ---
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const menuRef = useRef(null);
 
-  function handleMouseEnter() {
-    console.log("Mouse entered card");
-    scale.set(scaleOnHover);
-  }
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setIsMenuOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
-  function handleMouseLeave() {
-    console.log("Mouse left card");
-    rotateX.set(0);
-    rotateY.set(0);
-    rotateFigcaption.set(0);
-    scale.set(1);
-  }
+  const handleMenuClick = (e) => {
+    e.stopPropagation(); // Prevents card's onClick
+    e.preventDefault();
+    setIsMenuOpen((prev) => !prev);
+  };
+
+  const handleReport = (e) => {
+    e.stopPropagation(); // Prevents card's onClick
+    e.preventDefault();
+    if (onReportClick) {
+      onReportClick(productId); // Call parent handler
+    }
+    setIsMenuOpen(false); // Close menu
+  };
+  // --- END OF ADDED LOGIC ---
 
   return (
     <figure
@@ -59,9 +69,8 @@ export default function TiltedCard({
       }}
       className="relative [perspective:800px] flex flex-col items-center cursor-pointer justify-center"
       style={{ height: containerHeight, width: containerWidth }}
-      onMouseMove={handleMouse}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+      // onMouseEnter={handleMouseEnter}
+      // onMouseLeave={handleMouseLeave}
     >
       {showMobileWarning && (
         <div className="absolute top-4 text-center text-sm block sm:hidden text-gray-300">
@@ -96,6 +105,37 @@ export default function TiltedCard({
           </motion.div>
         )}
       </motion.div>
+
+      {/* --- 5. ADDED MENU RENDER --- */}
+      {onReportClick && (
+        <div
+          className="absolute bottom-3 right-2 z-30" // Positioned on card
+          ref={menuRef}
+        >
+          <div
+            className="bg-slate-800 backdrop-blur-sm rounded-full p-1 cursor-pointer"
+            onClick={handleMenuClick}
+          >
+            <MoreVertical className="w-5 h-5 text-white" />
+          </div>
+          {isMenuOpen && (
+            <div
+              className="absolute bottom-full right-0 mb-2 z-40 bg-slate-900 shadow-lg rounded-md p-2 w-40 border border-gray-700"
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={handleReport}
+                className="w-full text-left hover:text-red-600 text-gray-200 px-2 py-1 rounded-md"
+              >
+                Report Product
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+      {/* --- END OF ADDED MENU --- */}
+
+      {children}
     </figure>
   );
 }

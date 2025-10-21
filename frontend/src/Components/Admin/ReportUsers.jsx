@@ -52,7 +52,6 @@ const ReportUsers = () => {
     const fetchReports = async () => {
       try {
         const res = await axios.get("http://localhost:5000/api/reports");
-        console.log(res);
         
         const filtered = res.data.filter(
           (r) => r.reportedType === "User"

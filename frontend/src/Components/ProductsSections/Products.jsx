@@ -1,11 +1,12 @@
-import React, { useEffect, useMemo, useState, useRef } from "react";
+import React, { useEffect, useMemo, useState } from "react"; // 1. REMOVED useRef
 import { useNavigate } from "react-router-dom";
 import TiltedCard from "../Home/TitleCard";
-import { MoreVertical } from "lucide-react";
+// import { MoreVertical } from "lucide-react"; // 2. REMOVED
 import ReportProductModal from "../Modals/ReportProductModal";
 import useProductStore from "../../store/useProductStore";
 import useSearchStore from "../../store/useSearchStore";
 import useFilterStore from "../../store/useFilterStore";
+import HeartIcon from "../Icons/HeartIcon";
 
 const Products = () => {
   const { products, fetchProducts, isLoading, fetchFavorites } = useProductStore();
@@ -16,41 +17,34 @@ const Products = () => {
     selectedLocations,
     priceRange,
     sortBy,
-    hasActiveFilters
+    hasActiveFilters,
   } = useFilterStore();
 
   const navigate = useNavigate();
 
-  const [menuOpenIndex, setMenuOpenIndex] = useState(null);
+  // 3. REMOVED menuOpenIndex and menuRefs
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
-  const menuRefs = useRef([]);
 
   useEffect(() => {
-    console.log("Fetching products...");
     fetchProducts();
     fetchFavorites();
   }, []);
 
-  useEffect(() => {
-    const handleClickOutside = (e) => {
-      if (
-        menuRefs.current[menuOpenIndex] &&
-        !menuRefs.current[menuOpenIndex].contains(e.target)
-      ) {
-        console.log("Clicked outside menu, closing menu index", menuOpenIndex);
-        setMenuOpenIndex(null);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, [menuOpenIndex]);
+  // 4. REMOVED handleClickOutside useEffect
 
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
-    // ... same filtering logic
+    // TODO: Implement filtering logic based on query, selectedCategories, etc.
     return filtered;
   }, [products, query, selectedCategories, selectedConditions, selectedLocations, priceRange, sortBy]);
+
+  // 5. ADDED handler to pass to card
+  const handleReportClick = (productId) => {
+    console.log("Report click handled in Products.js, productId:", productId);
+    setSelectedProductId(productId);
+    setReportModalOpen(true);
+  };
 
   if (isLoading) {
     return (
@@ -70,9 +64,9 @@ const Products = () => {
           {filteredProducts.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 justify-items-center">
               {filteredProducts.map((product, index) => (
-                <div key={product._id} className="relative group">
+                <div key={product._id} className="group w-full">
                   <TiltedCard
-                    productId={product._id}
+                    productId={product._id} // 6. PASS productId
                     imageSrc={product.images?.[0] || "/images/default.png"}
                     altText={product.title}
                     captionText={product.title}
@@ -85,10 +79,14 @@ const Products = () => {
                     displayOverlayContent={true}
                     isSold={product.status === "sold"}
                     onClick={() => navigate(`/details/${product._id}`)}
+                    onReportClick={handleReportClick} // 7. PASS handler
                     overlayContent={
                       <>
                         <div className="absolute top-2 left-2 bg-blue-500/90 text-white text-xs font-semibold px-2 py-1 rounded-md z-20 flex items-center gap-1">
                           {product.category}
+                        </div>
+                        <div className="absolute top-2 right-2 z-20">
+                          <HeartIcon product={product} />
                         </div>
                         <div className="absolute bottom-0 left-0 right-0 bg-gray-900/90 text-white px-3 py-2 rounded-b-lg flex flex-col gap-1 z-10">
                           <span className="text-sm font-bold truncate">📌 {product.title}</span>
@@ -105,42 +103,9 @@ const Products = () => {
                       </>
                     }
                   />
-
-                  {/* Bottom-right menu */}
-                  <div
-                    className="absolute bottom-3 right-2 z-30 bg-slate-800 backdrop-blur-sm rounded-full p-1 cursor-pointer"
-                    ref={el => menuRefs.current[index] = el}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      console.log("Menu clicked for product:", product.title);
-                      setMenuOpenIndex(menuOpenIndex === index ? null : index);
-                      setSelectedProductId(product._id);
-                    }}
-                  >
-                    <MoreVertical className="w-5 h-5 text-white" />
-                  </div>
-
-                  {menuOpenIndex === index && (
-                    <div
-                      className="absolute bottom-10 right-2 z-40 bg-slate-900 shadow-lg rounded-md p-2 w-40 border border-gray-700"
-                      ref={el => menuRefs.current[index] = el}
-                      onClick={(e) => e.stopPropagation()} // prevent closing the menu
-                    >
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation(); // prevent parent click
-                          console.log("Clicked Report Product button, productId:", product._id);
-                          setSelectedProductId(product._id);
-                          setReportModalOpen(true);
-                        }}
-                        className="w-full text-left hover:text-red-600 text-gray-200 px-2 py-1 rounded-md"
-                      >
-                        Report Product
-                      </button>
-                    </div>
-
-                  )}
-
+                  
+                  {/* 8. REMOVED the entire menu div from here */}
+                  
                 </div>
               ))}
             </div>
@@ -159,6 +124,7 @@ const Products = () => {
           onClose={() => {
             console.log("Closing report modal");
             setReportModalOpen(false);
+            setSelectedProductId(null); // Clear selected ID
           }}
           productId={selectedProductId}
         />
