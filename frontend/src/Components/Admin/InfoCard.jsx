@@ -25,13 +25,13 @@ const InfoCard = ({ title, value, change, icon: Icon, trend, color }) => {
             trend === "up" ? "text-green-600" : "text-red-600"
           }`}
         >
-          {trend === "up" ? (
+          {/* {trend === "up" ? (
             <ArrowUpRight className="h-4 w-4" />
           ) : (
             <ArrowDownRight className="h-4 w-4" />
-          )}
-          <span>{change}</span>
-          <span className="text-gray-400">vs last month</span>
+          )} */}
+          {/* <s  pan>{change}</s> */}
+          {/* <span className="text-gray-400">vs last month</span> */}
         </p>
       </div>
     </div>

@@ -15,7 +15,18 @@ import {
   Cell,
 } from "recharts";
 import axios from "axios";
-import { COLORS } from "../../helper/colorData";
+
+// Removed the problematic import and defined COLORS directly
+const COLORS = [
+  "#8884d8", // Purple
+  "#82ca9d", // Green
+  "#FFBB28", // Yellow
+  "#FF8042", // Orange
+  "#0088FE", // Blue
+  "#00C49F", // Teal
+  "#FF00FF", // Magenta
+  "#E36414", // Darker Orange
+];
 
 const ChartsSection = () => {
   const [userData, setUserData] = useState([]);
@@ -26,15 +37,24 @@ const ChartsSection = () => {
     const fetchData = async () => {
       try {
         // User growth
-        const userRes = await axios.get("http://localhost:5000/api/admin/charts/users", { withCredentials: true });
+        const userRes = await axios.get(
+          "http://localhost:5000/api/admin/charts/users",
+          { withCredentials: true }
+        );
         setUserData(userRes.data);
 
         // Product growth
-        const productRes = await axios.get("http://localhost:5000/api/admin/charts/products", { withCredentials: true });
+        const productRes = await axios.get(
+          "http://localhost:5000/api/admin/charts/products",
+          { withCredentials: true }
+        );
         setProductData(productRes.data);
 
         // Products by category
-        const categoryRes = await axios.get("http://localhost:5000/api/admin/charts/categories", { withCredentials: true });
+        const categoryRes = await axios.get(
+          "http://localhost:5000/api/admin/charts/categories",
+          { withCredentials: true }
+        );
         setCategoryData(categoryRes.data);
       } catch (err) {
         console.error("Error fetching chart data:", err);
@@ -46,7 +66,6 @@ const ChartsSection = () => {
 
   return (
     <div className="mt-10 grid grid-cols-1 lg:grid-cols-2 gap-6">
-
       {/* Line Chart - User Growth */}
       <div className="bg-slate-900 border border-gray-50 p-6 rounded-2xl shadow">
         <h3 className="text-lg font-semibold mb-4 text-white">
@@ -57,32 +76,42 @@ const ChartsSection = () => {
             <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
             <XAxis dataKey="month" stroke="#fff" />
             <YAxis stroke="#fff" />
-            <Tooltip contentStyle={{ backgroundColor: "#334155", border: "none" }} />
+            <Tooltip
+              contentStyle={{ backgroundColor: "#334155", border: "none" }}
+            />
             <Legend />
-            <Line type="monotone" dataKey="users" stroke="#8884d8" strokeWidth={3} activeDot={{ r: 8 }} />
+            <Line
+              type="monotone"
+              dataKey="users"
+              stroke="#8884d8"
+              strokeWidth={3}
+              activeDot={{ r: 8 }}
+            />
           </LineChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Bar Chart - Products Added */}
+      {/* Bar Chart - Products Added (STYLES UPDATED) */}
       <div className="bg-slate-900 border border-gray-50 p-6 rounded-2xl shadow">
         <h3 className="text-lg font-semibold mb-4 text-white">
           Products Added Per Month
         </h3>
         <ResponsiveContainer width="100%" height={300}>
           <BarChart data={productData}>
-            <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" />
-            <YAxis />
-            <Tooltip contentStyle={{ backgroundColor: "#fff", border: "1px solid #ccc" }} />
+            <CartesianGrid strokeDasharray="3 3" strokeOpacity={0.3} />
+            <XAxis dataKey="month" stroke="#fff" />
+            <YAxis stroke="#fff" />
+            <Tooltip
+              contentStyle={{ backgroundColor: "#334155", border: "none" }}
+            />
             <Legend />
             <Bar dataKey="products" fill="#82ca9d" />
           </BarChart>
         </ResponsiveContainer>
       </div>
 
-      {/* Pie Chart - Products by Category */}
-      <div className="bg-slate-900 border border-gray-50 p-6 rounded-2xl shadow">
+      {/* Pie Chart - Products by Category (FULL WIDTH) */}
+      <div className="bg-slate-900 lg:col-span-2 border border-gray-50 p-6 rounded-2xl shadow">
         <h3 className="text-lg font-semibold mb-4 text-white">
           Products by Category
         </h3>
@@ -95,13 +124,25 @@ const ChartsSection = () => {
               outerRadius={120}
               fill="#8884d8"
               dataKey="value"
-              label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+              label={({ name, percent }) =>
+                `${name} ${(percent * 100).toFixed(0)}%`
+              }
             >
               {categoryData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
               ))}
             </Pie>
-            <Tooltip formatter={(value, name) => [value, name]} />
+            <Tooltip
+              formatter={(value, name) => [value, name]}
+              contentStyle={{
+                backgroundColor: "#334155",
+                border: "none",
+                borderRadius: "8px",
+              }}
+            />
           </PieChart>
         </ResponsiveContainer>
       </div>
@@ -110,3 +151,4 @@ const ChartsSection = () => {
 };
 
 export default ChartsSection;
+

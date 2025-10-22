@@ -5,7 +5,7 @@ const mongoose = require('mongoose'); // Import Mongoose to access validation to
 
 
 const createReport = async (req, res) => {
-  
+
   try {
     if (!req.user || !req.user.id) {
       console.error("Authentication error: req.user is not defined on the request object.");
@@ -33,7 +33,7 @@ const createReport = async (req, res) => {
       const productToReport = await Product.findById(reportedProduct);
       if (!productToReport) return res.status(404).json({ msg: 'Reported product not found.' });
     } else {
-        return res.status(400).json({ msg: 'Invalid reportedType. Must be "User" or "Product".' });
+      return res.status(400).json({ msg: 'Invalid reportedType. Must be "User" or "Product".' });
     }
 
     const report = new Report({
@@ -65,12 +65,36 @@ const getAllReports = async (req, res) => {
     res.status(500).json({ msg: 'Server error' });
   }
 };
-
-
 const deleteReportedProduct = async (req, res) => {
-  res.status(200).json({ msg: `Logic to delete product with ID ${req.params.productId} goes here.` });
-};
+  try {
 
+    const id = req.params.id.trim();
+
+    // Check if the ID is a valid MongoDB ObjectId
+    // const mongoose = require("mongoose");
+    // if (!mongoose.Types.ObjectId.isValid(id)) {
+    //   return res.status(400).json({ message: "Invalid ID format" });
+    // }
+
+    // Log what exists before deleting
+    const exists = await Report.findById(id);
+
+    // Try deleting
+    const report = await Report.findByIdAndDelete(id);
+
+    if (!report)
+      return res.status(404).json({ message: "Report not found in database" });
+
+    res.status(200).json({
+      success: true,
+      message: "Report deleted successfully",
+      deleted: report,
+    });
+  } catch (error) {
+    console.error("❌ Error deleting report:", error);
+    res.status(500).json({ message: "Error deleting report", error });
+  }
+};
 
 module.exports = {
   createReport,

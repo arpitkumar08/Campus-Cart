@@ -16,6 +16,6 @@ router.post("/", protect, createReport); // For a normal user to submit a report
 router.get("/", protect,  getAllReports);
 
 // For admins to take action (e.g., delete a product)
-router.delete("/:productId", protect, verifyAdmin, deleteReportedProduct);
+router.delete("/:id",  deleteReportedProduct);
 
 module.exports = router;
