@@ -66,32 +66,16 @@ const getAllReports = async (req, res) => {
   }
 };
 const deleteReportedProduct = async (req, res) => {
+  console.log("🟡 Received delete request for ID:", req.params.id); // add this
   try {
+    const report = await Report.findByIdAndDelete(req.params.id);
+    console.log("🔍 Report found before deletion:", report);
 
-    const id = req.params.id.trim();
+    if (!report) return res.status(404).json({ message: "Report not found" });
 
-    // Check if the ID is a valid MongoDB ObjectId
-    // const mongoose = require("mongoose");
-    // if (!mongoose.Types.ObjectId.isValid(id)) {
-    //   return res.status(400).json({ message: "Invalid ID format" });
-    // }
-
-    // Log what exists before deleting
-    const exists = await Report.findById(id);
-
-    // Try deleting
-    const report = await Report.findByIdAndDelete(id);
-
-    if (!report)
-      return res.status(404).json({ message: "Report not found in database" });
-
-    res.status(200).json({
-      success: true,
-      message: "Report deleted successfully",
-      deleted: report,
-    });
+    res.status(200).json({ success: true, message: "Report deleted successfully" });
   } catch (error) {
-    console.error("❌ Error deleting report:", error);
+    console.error("Error deleting report:", error);
     res.status(500).json({ message: "Error deleting report", error });
   }
 };

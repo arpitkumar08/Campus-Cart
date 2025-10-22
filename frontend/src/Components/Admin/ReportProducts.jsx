@@ -3,7 +3,7 @@ import axios from "axios";
 import { MoreHorizontal } from "lucide-react";
 import DropdownMenu from "../../Components/Admin/DropdownMenu";
 
-const ProductRow = ({ report }) => {
+const ProductRow = ({ report, onActionComplete }) => {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef();
 
@@ -37,6 +37,8 @@ const ProductRow = ({ report }) => {
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
             type="product"
+            productId={report._id} // ✅ report _id
+            onActionComplete={onActionComplete} // ✅ refresh table after action
           />
         )}
       </td>
@@ -48,21 +50,23 @@ const ReportProducts = () => {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchReports = async () => {
-      try {
-        const res = await axios.get("http://localhost:5000/api/reports");
-        const filtered = res.data.filter(
-          (r) => r.reportedType === "Product"
-        );
-        setReports(filtered);
-      } catch (err) {
-        console.error("Error fetching product reports:", err);
-      } finally {
-        setLoading(false);
-      }
-    };
+  const fetchReports = async () => {
+    setLoading(true);
+    try {
+      const res = await axios.get("http://localhost:5000/api/reports", {
+        withCredentials: true,
+      });
+      const filtered = res.data.filter((r) => r.reportedType === "Product");
+      setReports(filtered);
+    } catch (err) {
+      console.error("Error fetching product reports:", err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Fetch reports on mount
+  useEffect(() => {
     fetchReports();
   }, []);
 
@@ -90,7 +94,11 @@ const ReportProducts = () => {
               </thead>
               <tbody>
                 {reports.map((report) => (
-                  <ProductRow key={report._id} report={report} />
+                  <ProductRow
+                    key={report._id}
+                    report={report}
+                    onActionComplete={fetchReports} // ✅ refresh parent table
+                  />
                 ))}
               </tbody>
             </table>

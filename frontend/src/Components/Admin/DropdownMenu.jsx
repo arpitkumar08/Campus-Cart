@@ -1,19 +1,18 @@
 import React, { useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { UserX, Ban, Trash2 } from "lucide-react";
-import axios from "axios"; // Import axios to make API calls
+import { UserX, Trash2 } from "lucide-react";
+import axios from "axios";
 
 const DropdownMenu = ({
   isOpen,
   onClose,
   type,
-  userId, // Changed from onSuspendUser
-  productId, // Changed from onDeleteProduct
-  onActionComplete, // Add a prop to refetch data in the parent
+  userId,
+  productId, // report _id
+  onActionComplete, // callback to refresh parent data
 }) => {
   const menuRef = useRef();
 
-  // Close when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (menuRef.current && !menuRef.current.contains(e.target)) {
@@ -24,22 +23,19 @@ const DropdownMenu = ({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [onClose]);
 
-  // Handler functions to also close the menu after action
   const handleDelete = async (e) => {
+
+    console.log("handleDelete clicked")
     e.stopPropagation();
     if (type !== "product" || !productId) return;
 
     try {
-      // Use the API route structure you provided
-      await axios.delete(
-        `http://localhost:5000/api/products/deleteproduct/${productId}`,
-        { withCredentials: true }
+      await axios.delete(`http://localhost:5000/api/reports/${productId}`, { withCredentials: true, }
       );
-      // You can add a toast notification here for success
-      if (onActionComplete) onActionComplete(); // Tell the parent to refresh
+      
+      if (onActionComplete) onActionComplete(); // refresh table
     } catch (err) {
-      console.error("Error deleting product:", err);
-      // You can add a toast notification here for error
+      console.error("Error deleting report:", err);
     }
     onClose();
   };
@@ -49,17 +45,14 @@ const DropdownMenu = ({
     if (!userId) return;
 
     try {
-      // Assuming a similar API structure for suspending a user
       await axios.put(
-        `http://localhost:5000/api/admin/suspenduser/${userId}`, // This is an example route
+        `http://localhost:5000/api/admin/suspenduser/${userId}`,
         {},
         { withCredentials: true }
       );
-      // You can add a toast notification here for success
-      if (onActionComplete) onActionComplete(); // Tell the parent to refresh
+      if (onActionComplete) onActionComplete();
     } catch (err) {
       console.error("Error suspending user:", err);
-      // You can add a toast notification here for error
     }
     onClose();
   };
@@ -76,7 +69,6 @@ const DropdownMenu = ({
           className="absolute right-0 mt-2 w-44 bg-zinc-800 border border-zinc-700 rounded-lg shadow-lg z-50"
           onClick={(e) => e.stopPropagation()}
         >
-          {/* Suspend User Button - common for both */}
           <button
             onClick={handleSuspend}
             className="flex items-center w-full px-3 py-2 text-sm hover:bg-zinc-700 text-yellow-400"
@@ -84,18 +76,9 @@ const DropdownMenu = ({
             <UserX size={16} className="mr-2" /> Suspend User
           </button>
 
-          {/* Ban Button - common for both */}
-          {/* <button className="flex items-center w-full px-3 py-2 text-sm hover:bg-zinc-700 text-red-500">
-            <Ban size={16} className="mr-2" /> Ban {type === "product" ? "Product" : "User"}
-          </button> */}
-
-          {/* Delete Product - only for products */}
           {type === "product" && (
             <button
-              onClick={(e) => {
-                handleDelete(e);
-                console.log("Delete button clicked");
-              }}
+              onClick={handleDelete}
               className="flex items-center w-full px-3 py-2 text-sm hover:bg-zinc-700 text-red-500"
             >
               <Trash2 size={16} className="mr-2" /> Delete Product
@@ -108,4 +91,3 @@ const DropdownMenu = ({
 };
 
 export default DropdownMenu;
-

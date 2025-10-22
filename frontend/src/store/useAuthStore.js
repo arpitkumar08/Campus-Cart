@@ -45,7 +45,6 @@ export const useAuthStore = create((set) => ({
         error: null,
         isLoading: false,
       });
-      console.log("✅ Login response:", response.data);
 
       const { user } = response.data;
 
