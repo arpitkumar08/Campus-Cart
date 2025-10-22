@@ -1,7 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react"; // 1. REMOVED useRef
+import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import TiltedCard from "../Home/TitleCard";
-// import { MoreVertical } from "lucide-react"; // 2. REMOVED
 import ReportProductModal from "../Modals/ReportProductModal";
 import useProductStore from "../../store/useProductStore";
 import useSearchStore from "../../store/useSearchStore";
@@ -9,7 +8,8 @@ import useFilterStore from "../../store/useFilterStore";
 import HeartIcon from "../Icons/HeartIcon";
 
 const Products = () => {
-  const { products, fetchProducts, isLoading, fetchFavorites } = useProductStore();
+  const { products, fetchProducts, isLoading, fetchFavorites } =
+    useProductStore();
   const { query } = useSearchStore();
   const {
     selectedCategories,
@@ -17,29 +17,86 @@ const Products = () => {
     selectedLocations,
     priceRange,
     sortBy,
-    hasActiveFilters,
+    hasActiveFilters, // You can use this to show a "Clear Filters" button
   } = useFilterStore();
 
   const navigate = useNavigate();
 
-  // 3. REMOVED menuOpenIndex and menuRefs
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [selectedProductId, setSelectedProductId] = useState(null);
 
   useEffect(() => {
     fetchProducts();
     fetchFavorites();
-  }, []);
+  }, [fetchProducts, fetchFavorites]); // <-- Added dependencies
 
-  // 4. REMOVED handleClickOutside useEffect
-
+  // --- FIX: This section is now populated with filtering logic ---
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
-    // TODO: Implement filtering logic based on query, selectedCategories, etc.
-    return filtered;
-  }, [products, query, selectedCategories, selectedConditions, selectedLocations, priceRange, sortBy]);
 
-  // 5. ADDED handler to pass to card
+    // 1. Apply Search Query
+    if (query) {
+      const searchQuery = query.toLowerCase();
+      filtered = filtered.filter(
+        (product) =>
+          product.title.toLowerCase().includes(searchQuery) ||
+          product.category.toLowerCase().includes(searchQuery) ||
+          (product.location &&
+            product.location.toLowerCase().includes(searchQuery))
+      );
+    }
+
+    // 2. Apply Category Filters
+    if (selectedCategories.length > 0) {
+      filtered = filtered.filter((product) =>
+        selectedCategories.includes(product.category)
+      );
+    }
+
+    // 3. Apply Condition Filters
+    if (selectedConditions.length > 0) {
+      filtered = filtered.filter((product) =>
+        selectedConditions.includes(product.condition)
+      );
+    }
+
+    // 4. Apply Location Filters
+    if (selectedLocations.length > 0) {
+      filtered = filtered.filter((product) =>
+        selectedLocations.includes(product.location)
+      );
+    }
+
+    // 5. Apply Price Range Filter (Assuming priceRange is [min, max])
+    if (priceRange && priceRange[1] > priceRange[0]) {
+      filtered = filtered.filter(
+        (product) =>
+          product.price >= priceRange[0] && product.price <= priceRange[1]
+      );
+    }
+
+    // 6. Apply Sorting
+    if (sortBy === "price_asc") {
+      filtered.sort((a, b) => a.price - b.price);
+    } else if (sortBy === "price_desc") {
+      filtered.sort((a, b) => b.price - a.price);
+    } else if (sortBy === "date_new") {
+      // Assuming products have a 'createdAt' field
+      filtered.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    }
+
+    return filtered;
+  }, [
+    products,
+    query,
+    selectedCategories,
+    selectedConditions,
+    selectedLocations,
+    priceRange,
+    sortBy,
+  ]);
+  // --- END OF FIX ---
+
   const handleReportClick = (productId) => {
     console.log("Report click handled in Products.js, productId:", productId);
     setSelectedProductId(productId);
@@ -66,7 +123,7 @@ const Products = () => {
               {filteredProducts.map((product, index) => (
                 <div key={product._id} className="group w-full">
                   <TiltedCard
-                    productId={product._id} // 6. PASS productId
+                    productId={product._id}
                     imageSrc={product.images?.[0] || "/images/default.png"}
                     altText={product.title}
                     captionText={product.title}
@@ -79,7 +136,7 @@ const Products = () => {
                     displayOverlayContent={true}
                     isSold={product.status === "sold"}
                     onClick={() => navigate(`/details/${product._id}`)}
-                    onReportClick={handleReportClick} // 7. PASS handler
+                    onReportClick={handleReportClick}
                     overlayContent={
                       <>
                         <div className="absolute top-2 left-2 bg-blue-500/90 text-white text-xs font-semibold px-2 py-1 rounded-md z-20 flex items-center gap-1">
@@ -89,10 +146,16 @@ const Products = () => {
                           <HeartIcon product={product} />
                         </div>
                         <div className="absolute bottom-0 left-0 right-0 bg-gray-900/90 text-white px-3 py-2 rounded-b-lg flex flex-col gap-1 z-10">
-                          <span className="text-sm font-bold truncate">📌 {product.title}</span>
-                          <span className="text-sm font-semibold text-green-400">💰 ₹{product.price}</span>
+                          <span className="text-sm font-bold truncate">
+                            📌 {product.title}
+                          </span>
+                          <span className="text-sm font-semibold text-green-400">
+                            💰 ₹{product.price}
+                          </span>
                           <div className="flex flex-col items-start gap-2 justify-between text-xs text-gray-400">
-                            <span className="truncate">📍 {product.location}</span>
+                            <span className="truncate">
+                              📍 {product.location}
+                            </span>
                             {product.condition && (
                               <span className="ml-2 bg-gray-700/50 px-1 py-0.5 rounded text-xs">
                                 {product.condition}
@@ -103,16 +166,19 @@ const Products = () => {
                       </>
                     }
                   />
-                  
-                  {/* 8. REMOVED the entire menu div from here */}
-                  
                 </div>
               ))}
             </div>
           ) : (
             <div className="text-center py-12 text-gray-400">
               <div className="text-6xl mb-4">🔍</div>
-              <div className="text-xl font-semibold mb-2">No products found</div>
+              <div className="text-xl font-semibold mb-2">
+                No products found
+              </div>
+              <p>
+                Try adjusting your search or filters to find what you're looking
+                for.
+              </p>
             </div>
           )}
         </div>
@@ -124,7 +190,7 @@ const Products = () => {
           onClose={() => {
             console.log("Closing report modal");
             setReportModalOpen(false);
-            setSelectedProductId(null); // Clear selected ID
+            setSelectedProductId(null);
           }}
           productId={selectedProductId}
         />
