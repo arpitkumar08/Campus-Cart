@@ -119,7 +119,7 @@ const Products = () => {
       <div className="p-6">
         <div className="max-w-7xl mx-auto">
           {filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 justify-items-center">
+            <div className="grid grid-cols-1 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-4 gap-2 sm:gap-4 justify-items-center">
               {filteredProducts.map((product, index) => (
                 <div key={product._id} className="group w-full">
                   <TiltedCard
