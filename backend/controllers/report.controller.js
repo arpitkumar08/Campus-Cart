@@ -72,17 +72,17 @@ const deleteReportedProduct = async (req, res) => {
     const report = await Report.findById(req.params.id);
     if (!report) return res.status(404).json({ message: "Report not found" });
 
-    console.log("🔍 Report found before deletion:", report);
+    // console.log("🔍 Report found before deletion:", report);
 
     // Only proceed if it's a Product report
     if (report.reportedType === "Product" && report.reportedProduct) {
       const deletedProduct = await Product.findByIdAndDelete(report.reportedProduct);
 
-      if (deletedProduct) {
-        console.log("✅ Reported product deleted:", deletedProduct._id);
-      } else {
-        console.warn("⚠️ Reported product not found or already deleted");
-      }
+      // if (deletedProduct) {
+      //   console.log("✅ Reported product deleted:", deletedProduct._id);
+      // } else {
+      //   console.warn("⚠️ Reported product not found or already deleted");
+      // }
     }
 
     // Now delete the report itself
@@ -95,7 +95,7 @@ const deleteReportedProduct = async (req, res) => {
 
   } catch (error) {
     console.error("Error deleting reported product:", error);
-    res.status(500).json({ message: "Error deleting reported product", error });
+    res.status(500).json({ message: "Error deleting reported product", error });  
   }
 };
 

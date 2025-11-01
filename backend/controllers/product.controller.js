@@ -94,6 +94,8 @@ exports.getAllProducts = async (req, res) => {
       .populate("owner", "fullName email") // populate owner info
       .sort({ createdAt: -1 });
 
+      
+
     res.status(200).json({
       success: true,
       count: products.length,
