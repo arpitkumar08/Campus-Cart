@@ -25,19 +25,19 @@ const Header = () => {
   const conversations = useChatStore((state) => state.conversations);
   const fetchConversations = useChatStore((state) => state.getConversations);
   const incrementUnreadCount = useChatStore(
-    (state) => state.incrementUnreadCount
+    (state) => state.incrementUnreadCount,
   );
 
-  const unreadCount = conversations.reduce(
-    (sum, conv) => sum + (conv.unreadCount || 0),
-    0
+  const unreadCount = React.useMemo(
+    () => conversations.reduce((sum, conv) => sum + (conv.unreadCount || 0), 0),
+    [conversations],
   );
 
   // ✅ NEW: Create a filtered list of only the conversations with unread messages
-  const unreadConversations = conversations.filter(
-    (conv) => conv.unreadCount > 0
+  const unreadConversations = React.useMemo(
+    () => conversations.filter((conv) => conv.unreadCount > 0),
+    [conversations],
   );
-
 
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
@@ -60,7 +60,7 @@ const Header = () => {
         incrementUnreadCount(message.conversationId);
       } else {
         console.log(
-          "⏭️ SOCKET: Message is from current user, skipping increment"
+          "⏭️ SOCKET: Message is from current user, skipping increment",
         );
       }
       fetchConversations();

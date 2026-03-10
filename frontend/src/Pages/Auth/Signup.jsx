@@ -8,9 +8,6 @@ import PasswordStrengthMeter from '../../Components/PasswordStrengthMeter'
 import { Loader } from 'lucide-react'
 
 
-
-
-
 const Signup = () => {
 
   const [fullName, setFullName] = useState("")
@@ -20,7 +17,7 @@ const Signup = () => {
 
   const navigate = useNavigate()
 
-  const {   signup, isLoading } = useAuthStore()
+  const { signup, isLoading } = useAuthStore()
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -31,7 +28,6 @@ const Signup = () => {
     }
 
     setError("")
-    // TODO: integrate login logic
     try {
       await signup(fullName, email, password)
     } catch (error) {

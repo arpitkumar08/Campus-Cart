@@ -11,7 +11,6 @@ const Sidebar = () => {
     { name: "Users", icon: <FaUsers />, path: "/admin/users" },
     { name: "Products", icon: <FaBox />, path: "/admin/products" },
     { name: "Reports", icon: <FaFlag />, path: "/admin/reports" },
-    { name: "Settings", icon: <FaCog />, path: "/admin/settings" },
   ];
 
   return (

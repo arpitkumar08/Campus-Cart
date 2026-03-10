@@ -25,7 +25,6 @@ const sendVerificationEmail = async (email, verificationCode) => {
       html,
     });
 
-    console.log("✅ Verification email sent:", response);
   } catch (error) {
     console.error("❌ Error sending verification email:", error);
   }
@@ -48,7 +47,6 @@ const response = await resend.emails.send({
   html,
 });
 
-console.log("✅ Password reset email sent:", response);
   } catch (error) {
   console.error("❌ Error sending password reset email:", error);
 }

@@ -3,9 +3,7 @@ const router = express.Router();
 const chatCtrl = require("../controllers/chat.controller");
 const Conversation = require("../models/conversation.model"); // <-- add this import
 
-// -------------------------
-// Conversation Routes
-// -------------------------
+
 
 // Create or get a conversation between two users
 router.post("/conversations", chatCtrl.createConversation);

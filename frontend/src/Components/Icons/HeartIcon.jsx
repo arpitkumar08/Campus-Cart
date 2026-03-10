@@ -1,6 +1,6 @@
-import React from 'react';
-import { Heart } from 'lucide-react';
-import useProductStore from '../../store/useProductStore';
+import React from "react";
+import { Heart } from "lucide-react";
+import useProductStore from "../../store/useProductStore";
 
 const HeartIcon = ({ product, size = 20, className = "", showAnimation = true }) => {
   const { toggleFavorite, isFavorite } = useProductStore();
@@ -8,16 +8,18 @@ const HeartIcon = ({ product, size = 20, className = "", showAnimation = true })
 
   const handleClick = (e) => {
     e.preventDefault();
-    e.stopPropagation();
+    e.stopPropagation(); // ← ADD THIS LINE - Prevents event from bubbling to parent
+
     toggleFavorite(product._id);
   };
+
 
   return (
     <button
       onClick={handleClick}
       className={`relative p-2 rounded-full transition-all duration-200 ease-in-out
         hover:scale-110 hover:bg-white/20 active:scale-95
-        ${showAnimation ? 'transform' : ''}
+        ${showAnimation ? "transform" : ""}
         ${className}
       `}
       title={isLiked ? "Remove from favorites" : "Add to favorites"}
@@ -27,11 +29,12 @@ const HeartIcon = ({ product, size = 20, className = "", showAnimation = true })
       <Heart
         size={size}
         className={`relative z-10 transition-all duration-200 ease-in-out
-          ${isLiked 
-            ? 'fill-red-500 stroke-red-500 scale-110' 
-            : 'fill-none stroke-white hover:stroke-red-400'
+          ${
+            isLiked
+              ? "fill-red-500 stroke-red-500 scale-110"
+              : "fill-none stroke-white hover:stroke-red-400"
           }
-          ${showAnimation && isLiked ? 'animate-pulse' : ''}
+          ${showAnimation && isLiked ? "animate-pulse" : ""}
         `}
       />
 

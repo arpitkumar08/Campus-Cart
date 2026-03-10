@@ -57,7 +57,6 @@ io.on("connection", (socket) => {
   // Join conversation room
   socket.on("join_conversation", (conversationId) => {
     socket.join(conversationId);
-    console.log(`User joined room: ${conversationId}`);
   });
 
   // Receive & broadcast messages
@@ -72,9 +71,9 @@ io.on("connection", (socket) => {
     io.to(data.conversationId).emit("receive_message", data);
   });
 
-  socket.on("disconnect", () => {
-    console.log("❌ User disconnected:", socket.id);
-  });
+  // socket.on("disconnect", () => {
+  //   console.log("❌ User disconnected:", socket.id);
+  // });
 });
 
 // ✅ Start Server

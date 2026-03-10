@@ -103,9 +103,8 @@ const ProductDetails = () => {
                 key={idx}
                 src={img}
                 alt={`thumbnail-${idx}`}
-                className={`w-20 h-20 object-cover rounded-lg border cursor-pointer transition ${
-                  mainImage === img ? "border-blue-500" : "border-gray-700"
-                }`}
+                className={`w-20 h-20 object-cover rounded-lg border cursor-pointer transition ${mainImage === img ? "border-blue-500" : "border-gray-700"
+                  }`}
                 onClick={() => setMainImage(img)}
               />
             ))
@@ -122,9 +121,8 @@ const ProductDetails = () => {
 
         <div className="border-2 w-fit py-1 px-2 rounded-full">
           <p
-            className={`text-sm ${
-              product.isNegotiable ? "text-green-500" : "text-red-400"
-            }`}
+            className={`text-sm ${product.isNegotiable ? "text-green-500" : "text-red-400"
+              }`}
           >
             {product.isNegotiable ? "Negotiable" : "Non Negotiable"}
           </p>
@@ -155,19 +153,20 @@ const ProductDetails = () => {
           </button>
         ) : (
           <button
-            disabled={product.isSold}
-            className={`mt-4 ${
-              product.isSold
-                ? "bg-gray-600 cursor-not-allowed"
-                : "bg-green-600 hover:bg-green-700"
-            } text-white px-6 py-3 rounded-lg font-semibold transition w-fit`}
+            disabled={product.status === "sold"}
+            className={`mt-4 ${product.status === "sold"
+              ? "bg-gray-600 cursor-not-allowed"
+              : "bg-green-600 hover:bg-green-700"
+              } text-white px-6 py-3 rounded-lg font-semibold transition w-fit`}
             onClick={handleMarkSold}
           >
-            {product.isSold ? "✅ Product Sold" : "✔️ Mark as Sold"}
+            {product.status === "sold" ? "✅ Product Sold" : "✔️ Mark as Sold"}
           </button>
         )}
+
+
       </div>
-    </div>
+    </div >
   );
 };
 

@@ -19,7 +19,6 @@ export const useAuthStore = create((set) => ({
   signup: async (fullName, email, password) => {
     set({ isLoading: true, error: null });
     try {
-      console.log("🔹 Signup payload:", { fullName, email, password });
       const response = await axios.post(`${API_URL}/signup`, { fullName, email, password });
       set({ user: response.data.user, isAuthenticated: true, isLoading: false });
       return response.data;
@@ -37,7 +36,6 @@ export const useAuthStore = create((set) => ({
     try {
 
       const response = await axios.post(`${API_URL}/login`, { email, password });
-      console.log(response)
       set({
 
         isAuthenticated: true,
@@ -79,9 +77,7 @@ export const useAuthStore = create((set) => ({
   verifyEmail: async (code) => {
     set({ isLoading: true, error: null });
     try {
-      console.log("🔹 Verify Email code:", code);
       const response = await axios.post(`${API_URL}/verify-email`, { code });
-      console.log("✅ Verify Email response:", response.data);
       set({ user: response.data.user, isAuthenticated: true, isLoading: false });
       return response.data;
     } catch (error) {
@@ -111,9 +107,7 @@ export const useAuthStore = create((set) => ({
   forgotPassword: async (email) => {
     set({ isLoading: true, error: null });
     try {
-      console.log("🔹 Forgot Password payload:", { email });
       const response = await axios.post(`${API_URL}/forgot-password`, { email });
-      console.log("✅ Forgot Password response:", response.data);
       set({ message: response.data.message, isLoading: false });
       return response.data;
     } catch (error) {
@@ -129,9 +123,7 @@ export const useAuthStore = create((set) => ({
   resetPassword: async (token, password) => {
     set({ isLoading: true, error: null });
     try {
-      console.log("🔹 Reset Password payload:", { token, password });
       const response = await axios.post(`${API_URL}/reset-password/${token}`, { password });
-      console.log("✅ Reset Password response:", response.data);
       set({ message: response.data.message, isLoading: false });
       return response.data;
     } catch (error) {

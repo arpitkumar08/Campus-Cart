@@ -14,7 +14,7 @@ const Login = () => {
 
 
     const { login, isLoading } = useAuthStore()
-    
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
@@ -26,14 +26,9 @@ const Login = () => {
         setError(""); // reset previous error
 
         try {
-            // login() should return an object like:
-            // { token: "jwt_token", user: { role: "admin" | "user", ... } }
+           
             const response = await login(email, password);
 
-            // Optional: store token in localStorage or cookies
-            // localStorage.setItem("token", response.token);
-
-            // ✅ Role-based redirect
             if (response.user.role === "admin") {
                 navigate("/admin/dashboard");
             } else {

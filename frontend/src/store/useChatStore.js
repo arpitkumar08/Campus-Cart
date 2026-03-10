@@ -23,7 +23,6 @@ export const useChatStore = create((set, get) => ({
             const res = await axios.get(`${API_URL}/message/users`, {
                 withCredentials: true,
             });
-            console.log("✅ Users fetched:", res.data);
             set({
                 users: res.data,
                 isUsersLoading: false,

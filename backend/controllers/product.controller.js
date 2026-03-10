@@ -90,15 +90,24 @@ exports.deleteProduct = async (req, res) => {
 // ✅ Get all products
 exports.getAllProducts = async (req, res) => {
   try {
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 50; // Increased default limit to 50 to accommodate local frontend filtering
+    const skip = (page - 1) * limit;
+
     const products = await Product.find()
       .populate("owner", "fullName email") // populate owner info
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit);
 
-      
+    const total = await Product.countDocuments();
 
     res.status(200).json({
       success: true,
       count: products.length,
+      total,
+      page,
+      totalPages: Math.ceil(total / limit),
       response: products, // match your frontend expectation
     });
   } catch (error) {
@@ -110,15 +119,15 @@ exports.getAllProducts = async (req, res) => {
   }
 };
 
-
 // ✅ Get products listed by the logged-in user
 exports.mylistedProducts = async (req, res) => {
   try {
     // Use the logged-in user's ID provided by protect middleware
     const ownerId = req.user._id;
 
-
-    const products = await Product.find({ owner: ownerId }).sort({ createdAt: -1 });
+    const products = await Product.find({ owner: ownerId }).sort({
+      createdAt: -1,
+    });
 
     res.status(200).json({
       success: true,
@@ -152,8 +161,10 @@ exports.getProductDetails = async (req, res) => {
   const { id } = req.params;
 
   try {
-    const product = await Product.findById(id)
-      .populate("owner", "fullName email"); // ✅ populate the seller
+    const product = await Product.findById(id).populate(
+      "owner",
+      "fullName email",
+    ); // ✅ populate the seller
 
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
@@ -179,12 +190,18 @@ exports.markAsSold = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
-
     // Ownership/admin check
     if (req.user) {
       // Allow admin or the owner
-      if (req.user.role !== 'admin' && product.owner.toString() !== req.user.id) {
-        return res.status(403).json({ message: "You are not authorized to mark this product as sold" });
+      if (
+        req.user.role !== "admin" &&
+        product.owner.toString() !== req.user.id
+      ) {
+        return res
+          .status(403)
+          .json({
+            message: "You are not authorized to mark this product as sold",
+          });
       }
     } else {
       // If protect is removed and req.user doesn't exist
@@ -200,10 +217,8 @@ exports.markAsSold = async (req, res) => {
       message: "Product marked as sold successfully",
       product,
     });
-
   } catch (error) {
     console.error("Error marking product as sold:", error);
     res.status(500).json({ message: "Server error" });
   }
 };
-
