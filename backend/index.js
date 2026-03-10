@@ -2,6 +2,7 @@ const express = require('express');
 const dotenv = require('dotenv');
 const cookieParser = require('cookie-parser');
 const http = require('http');                  // NEW
+const https = require('https');
 const { Server } = require('socket.io');       // NEW
 const cors = require('cors');
 
@@ -43,7 +44,6 @@ app.use(cors({
 app.use(express.json());
 app.use(cookieParser());
 
-// ✅ Routes
 app.use("/api/auth", authRoutes);
 app.use("/api", productRoutes);
 app.use('/api/favorite', favoriteRoutes);
@@ -51,31 +51,36 @@ app.use('/api/chats', chatRoute);
 app.use('/api/reports', reportRoutes)
 app.use('/api/admin', adminRoutes)
 
-// ✅ Socket.IO Logic
 io.on("connection", (socket) => {
 
-  // Join conversation room
   socket.on("join_conversation", (conversationId) => {
     socket.join(conversationId);
   });
 
-  // Receive & broadcast messages
   socket.on("send_message", (data) => {
-    /*
-      data = {
-        conversationId,
-        senderId,
-        text
-      }
-    */
     io.to(data.conversationId).emit("receive_message", data);
   });
 
-  // socket.on("disconnect", () => {
-  //   console.log("❌ User disconnected:", socket.id);
-  // });
+
 });
 
-// ✅ Start Server
+const pingInterval = 14 * 60 * 1000; // 14 minutes
+app.get('/api/ping', (req, res) => {
+  res.status(200).json({ message: 'Server is awake' });
+});
+
 const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+
+  // Auto-ping logic
+  const backendUrl = process.env.BACKEND_URL || 'http://localhost:5000/api/ping'; // Replace with your Render URL + /api/ping in production
+  setInterval(() => {
+    const protocol = backendUrl.startsWith('https') ? https : http;
+    protocol.get(backendUrl, (res) => {
+      console.log(`[${new Date().toISOString()}] Pinged server to keep it awake. Status: ${res.statusCode}`);
+    }).on('error', (err) => {
+      console.error(`Error pinging server: ${err.message}`);
+    });
+  }, pingInterval);
+});
